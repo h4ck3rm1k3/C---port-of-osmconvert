@@ -17,6 +17,9 @@
 
 // just a note (for tests): -b=8.748,53.052,8.749,53.053
 // -Wall -lz -std=c99 -pedantic -g
+#define __STDC_CONSTANT_MACROS 1
+#include <string>
+using namespace std;
 #define MAXLOGLEVEL 2
 const char* helptext=
 "\nosmconvert " VERSION "\n"
@@ -197,7 +200,7 @@ const char* helptext=
 #include <fcntl.h>
 #include <sys/stat.h>
 
-typedef enum {false= 0,true= 1} bool;
+//typedef enum {/*false= 0,*/true= 1} bool;
 typedef uint8_t byte;
 typedef unsigned int uint;
 #define isdig(x) isdigit((unsigned char)(x))
@@ -823,7 +826,7 @@ return false;
             bep->chain= NULL;
             if(loglevel>=1)
               fprintf(stderr,
-                "+ %i %"PRIi32",%"PRIi32",%"PRIi32",%"PRIi32"\n",
+                "+ %i %i,%i,%i,%i\n",
                 (int)(bep-border__edge),
                 bep->x1,bep->y1,bep->x2,bep->y2);
             bep++;
@@ -838,7 +841,7 @@ return false;
           bep->chain= NULL;
           if(loglevel>=1)
             fprintf(stderr,
-              "c %i %"PRIi32",%"PRIi32",%"PRIi32",%"PRIi32"\n",
+              "c %i %i,%i,%i,%i\n",
               (int)(bep-border__edge),bep->x1,bep->y1,bep->x2,bep->y2);
           bep++;
           }  // end   last polygon was not closed
@@ -864,7 +867,7 @@ return false;
             bep->chain= NULL;
             if(loglevel>=1)
               fprintf(stderr,
-                "- %i %"PRIi32",%"PRIi32",%"PRIi32",%"PRIi32"\n",
+                "- %i %i,%i,%i,%i\n",
                 (int)(bep-border__edge),
                 bep->x1,bep->y1,bep->x2,bep->y2);
             bep++;
@@ -900,7 +903,7 @@ return false;
     while(bep->x1!=nil) {  // for each edge in list
       if(loglevel>=1)
         fprintf(stderr,
-          "> %i %"PRIi32",%"PRIi32",%"PRIi32",%"PRIi32"\n",
+          "> %i %i,%i,%i,%i\n",
           (int)(bep-border__edge),bep->x1,bep->y1,bep->x2,bep->y2);
       /*x1= bep->x1;*/ x2= bep->x2;
       bep2= bep;
@@ -946,13 +949,13 @@ return false;
     bep= border__edge;
     while(bep->x1!=nil) {  // for each edge in list
       fprintf(stderr,
-        "> %i %"PRIi32",%"PRIi32",%"PRIi32",%"PRIi32"\n",
+        "> %i %i,%i,%i,%i\n",
         (int)(bep-border__edge),bep->x1,bep->y1,bep->x2,bep->y2);
       bcp= bep->chain;
       while(bcp!=NULL) {  // for each chain link in edge
         bep2= bcp->edge;
         fprintf(stderr,
-          "  %i %"PRIi32",%"PRIi32",%"PRIi32",%"PRIi32"\n",
+          "  %i %i,%i,%i,%i\n",
           (int)(bep2-border__edge),
           bep2->x1,bep2->y1,bep2->x2,bep2->y2);
         bcp= bcp->next;
@@ -994,7 +997,7 @@ static bool border_queryinside(int32_t x,int32_t y) {
 
   #if MAXLOGLEVEL>=3
   if(loglevel>=3)
-    fprintf(stderr,"# %li,%li\n",x,y);
+    fprintf(stderr,"# %i,%i\n",x,y);
   #endif
   // first, consider border box (if any)
   if(border__bx1!=nil) {  // there is a border box
@@ -1022,7 +1025,7 @@ return true;
       while(i2>i1+1) {
         i= (i1+i2)/2;
         bep= border__edge+i;
-//fprintf(stderr,"s %i %i %i   %li\n",i1,i,i2,bep->x1); ///
+//fprintf(stderr,"s %i %i %i   %i\n",i1,i,i2,bep->x1); ///
         if(bep->x1 > x) i2= i;
         else i1= i;
 //fprintf(stderr,"  %i %i %i\n",i1,i,i2); ///
@@ -1039,7 +1042,7 @@ return true;
           cross++;
           #if MAXLOGLEVEL>=3
           if(loglevel>=3)
-            fprintf(stderr,"= %i %li,%li,%li,%li\n",
+            fprintf(stderr,"= %i %i,%i,%i,%i\n",
               (int)(bep-border__edge),bep->x1,bep->y1,bep->x2,bep->y2);
           #endif
           }
@@ -1051,21 +1054,21 @@ return true;
             cross++;
             #if MAXLOGLEVEL>=3
             if(loglevel>=3)
-              fprintf(stderr,"/ %i %li,%li,%li,%li\n",
+              fprintf(stderr,"/ %i %i,%i,%i,%i\n",
                 (int)(bep-border__edge),
                 bep->x1,bep->y1,bep->x2,bep->y2);
             #endif
             }
           #if MAXLOGLEVEL>=3
           else if(loglevel>=3)
-            fprintf(stderr,". %i %li,%li,%li,%li\n",
+            fprintf(stderr,". %i %i,%i,%i,%i\n",
               (int)(bep-border__edge),
               bep->x1,bep->y1,bep->x2,bep->y2);
           #endif
           }  // end   one line end north of point
         #if MAXLOGLEVEL>=3
         else if(loglevel>=3)
-            fprintf(stderr,"_ %i %li,%li,%li,%li\n",
+            fprintf(stderr,"_ %i %i,%i,%i,%i\n",
               (int)(bep-border__edge),bep->x1,bep->y1,bep->x2,bep->y2);
         #endif
         }  // end   point lies inside x-range
@@ -1077,7 +1080,7 @@ return true;
     break;
       bep= bcp->edge;
       }  // end   for own edge and each edge in chain
-//if(loglevel>=3) fprintf(stderr,"# %li,%li cross %i\n",x,y,cross);
+//if(loglevel>=3) fprintf(stderr,"# %i,%i cross %i\n",x,y,cross);
 return (cross&1)!=0;  // odd number of crossings
     }  // end   second, consider border polygon (if any)
   }  // end   border_queryinside()
@@ -1316,6 +1319,8 @@ static inline uint64_t read_count() {
 
 static const char* write__filename= NULL;
   // last name of the file; ==NULL: standard output;
+
+#include <stdint.h>
 static char write__buf[UINT64_C(16000000)];
 static char* write__bufe= write__buf+sizeof(write__buf);
   // (const) water mark for buffer filled 100%
@@ -1819,7 +1824,7 @@ static int32_t pb_hisver= 0;
 static int64_t pb_histime= 0;
 static int64_t pb_hiscset= 0;
 static uint32_t pb_hisuid= 0;
-static char* pb_hisuser= "";
+static string  pb_hisuser= "";
 
 static void pb_ini() {
   // initialize this module;
@@ -3572,6 +3577,73 @@ static inline void str_reset() {
   str__infop->tabi= str__infop->tabn= 0;
   }  // end   str_reset()
 
+static void str_read(byte** pp, string & s1p, string & s2p) {
+  // read an o5m formatted string (pair), e.g. key/val, from
+  // standard input buffer;
+  // if got a string reference, resolve it, using an internal
+  // string table;
+  // no reference is used if the strings are longer than
+  // 250 characters in total (252 including terminators);
+  // pp: address of a buffer pointer;
+  //     this pointer will be incremented by the number of bytes
+  //     the converted protobuf element consumes;
+  // s2p: ==NULL: read not a string pair but a single string;
+  // return:
+  // *s1p,*s2p: pointers to the strings which have been read;
+  char* p;
+  int len1,len2;
+  int ref;
+
+  p= (char*)*pp;
+  if(*p==0) {  // string (pair) given directly
+    s1p= ++p;
+    len1= strlen(p);
+    p+= len1+1;
+    if(s2p == "") {  // single string
+      //p= strchr(p,0)+1;  // jump over second string (if any)
+      if(len1<=str__tabstrM) {
+          // single string short enough for string table
+        stpcpy(str__infop->tab[str__infop->tabi],s1p.c_str())[1]= 0;
+          // add a second terminator, just in case someone will try
+          // to read this single string as a string pair later;
+        if(++str__infop->tabi>=str__tabM) str__infop->tabi= 0;
+        if(str__infop->tabn<str__tabM) str__infop->tabn++;
+        }  // end   single string short enough for string table
+      }  // end   single string
+    else {  // string pair
+      s2p= p;
+      len2= strlen(p);
+      p+= len2+1;
+      if(len1+len2<=str__tabstrM) {
+          // string pair short enough for string table
+        memcpy(str__infop->tab[str__infop->tabi],s1p.c_str(),len1+len2+2);
+        if(++str__infop->tabi>=str__tabM) str__infop->tabi= 0;
+        if(str__infop->tabn<str__tabM) str__infop->tabn++;
+        }  // end   string pair short enough for string table
+      }  // end   string pair
+    *pp= (byte*)p;
+    }  // end   string (pair) given directly
+  else {  // string (pair) given by reference
+    ref= pbf_uint32(pp);
+    if(ref>str__infop->tabn) {  // string reference invalid
+      WARNv("invalid .o5m string reference: %i->%i\n",
+        str__infop->tabn,ref)
+      s1p= "(invalid)";
+      if(s2p!="")  // caller wants a string pair
+        s2p= "(invalid)";
+      }  // end   string reference invalid
+    else {  // string reference valid
+      ref= str__infop->tabi-ref;
+      if(ref<0) ref+= str__tabM;
+      s1p= str__infop->tab[ref];
+      if(s2p!="")  // caller wants a string pair
+        s2p= strchr(str__infop->tab[ref],0)+1;
+      }  // end   string reference valid
+    }  // end   string (pair) given by reference
+
+}
+
+
 static void str_read(byte** pp,char** s1p,char** s2p) {
   // read an o5m formatted string (pair), e.g. key/val, from
   // standard input buffer;
@@ -3623,9 +3695,9 @@ static void str_read(byte** pp,char** s1p,char** s2p) {
     if(ref>str__infop->tabn) {  // string reference invalid
       WARNv("invalid .o5m string reference: %i->%i\n",
         str__infop->tabn,ref)
-      *s1p= "(invalid)";
+      *s1p= (char *)"(invalid)";
       if(s2p!=NULL)  // caller wants a string pair
-        *s2p= "(invalid)";
+        *s2p= (char *)"(invalid)";
       }  // end   string reference invalid
     else {  // string reference valid
       ref= str__infop->tabi-ref;
@@ -3870,21 +3942,21 @@ return;
     write_str("\" lat=\""); write_sfix7(lat);
     write_str("\" lon=\""); write_sfix7(lon);
     wo__history(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "\t</node>"NL;  // preset close tag
+    wo__xmlclosetag= (char *)"\t</node>"NL;  // preset close tag
     break;
   case 12:  // pbf2osm XML
     write_str("\t<node id=\""); write_sint64(id);
     write_str("\" lat=\""); write_sfix7o(lat);
     write_str("\" lon=\""); write_sfix7o(lon);
     wo__history(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "\t</node>"NL;  // preset close tag
+    wo__xmlclosetag= (char *)"\t</node>"NL;  // preset close tag
     break;
   case 13:  // Osmosis XML
     write_str("  <node id=\""); write_sint64(id);
     wo__history(hisver,histime,hiscset,hisuid,hisuser);
     write_str("\" lat=\""); write_sfix7(lat);
     write_str("\" lon=\""); write_sfix7(lon);
-    wo__xmlclosetag= "  </node>"NL;  // preset close tag
+    wo__xmlclosetag= (char *)"  </node>"NL;  // preset close tag
     break;
     }  // end   depending on output format
   wo__xmlshorttag= true;  // (default)
@@ -3915,17 +3987,17 @@ return;
   case 11:  // native XML
     write_str("\t<way id=\""); write_sint64(id);
     wo__history(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "\t</way>"NL;  // preset close tag
+    wo__xmlclosetag= (char *)"\t</way>"NL;  // preset close tag
     break;
   case 12:  // pbf2osm XML
     write_str("\t<way id=\""); write_sint64(id);
     wo__history(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "\t</way>"NL;  // preset close tag
+    wo__xmlclosetag= (char *)"\t</way>"NL;  // preset close tag
     break;
   case 13:  // Osmosis XML
     write_str("  <way id=\""); write_sint64(id);
     wo__history(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "  </way>"NL;  // preset close tag
+    wo__xmlclosetag= (char *)"  </way>"NL;  // preset close tag
     break;
     }  // end   depending on output format
   wo__xmlshorttag= true;  // (default)
@@ -3956,17 +4028,17 @@ return;
   case 11:  // native XML
     write_str("\t<relation id=\""); write_sint64(id);
     wo__history(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "\t</relation>"NL;  // preset close tag
+    wo__xmlclosetag= (char *)"\t</relation>"NL;  // preset close tag
     break;
   case 12:  // pbf2osm XML
     write_str("\t<relation id=\""); write_sint64(id);
     wo__history(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "\t</relation>"NL;  // preset close tag
+    wo__xmlclosetag= (char *)"\t</relation>"NL;  // preset close tag
     break;
   case 13:  // Osmosis XML
     write_str("  <relation id=\""); write_sint64(id);
     wo__history(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "  </relation>"NL;  // preset close tag
+    wo__xmlclosetag=(char *) "  </relation>"NL;  // preset close tag
     break;
     }  // end   depending on output format
   wo__xmlshorttag= true;  // (default)
@@ -3990,15 +4062,15 @@ return;
     switch(otype) {
     case 0: // node
       write_str("<delete>"NL"\t<node id=\""); write_sint64(id);
-      wo__xmlclosetag= "\"/>"NL"</delete>"NL;  // preset close tag
+      wo__xmlclosetag= (char *)"\"/>"NL"</delete>"NL;  // preset close tag
       break;
     case 1: // way
       write_str("<delete>"NL"\t<way id=\""); write_sint64(id);
-      wo__xmlclosetag= "\"/>"NL"</delete>"NL;  // preset close tag
+      wo__xmlclosetag= (char *)"\"/>"NL"</delete>"NL;  // preset close tag
       break;
     case 2:  // relation
       write_str("<delete>"NL"\t<relation id=\""); write_sint64(id);
-      wo__xmlclosetag= "\"/>"NL"</delete>"NL;
+      wo__xmlclosetag= (char *)"\"/>"NL"</delete>"NL;
         // preset close tag
       }
     wo__xmlshorttag= false;  // (default)
@@ -4459,11 +4531,11 @@ static inline bool oo__xmltag() {
       // find first character after the whitespace(s)
     c= *read_bufp;
     if(c==0) {
-      oo__xmlkey= oo__xmlval= "";
+      oo__xmlkey= oo__xmlval= (char *)"";
 return true;
       }
     else if(c=='/') {
-      oo__xmlkey= oo__xmlval= "";
+      oo__xmlkey= oo__xmlval=(char *) "";
       c= *++read_bufp;
       read_bufp++;
       if(c=='>') {  // short tag ands here
@@ -4483,7 +4555,7 @@ return false;
         // this has been long tag which is ending now
         while(!oo__ws(*read_bufp)) read_bufp++;
           // find next whitespace
-        oo__xmlkey= oo__xmlval= "";
+        oo__xmlkey= oo__xmlval= (char *)"";
 return true;
         }
   continue;
@@ -4491,7 +4563,7 @@ return true;
     oo__xmlkey= (char*)read_bufp;
     while(oo__le(*read_bufp)) read_bufp++;
     if(*read_bufp!='=') {
-      oo__xmlkey= "";
+      oo__xmlkey= (char *)"";
   continue;
       }
     *read_bufp++= 0;
@@ -4503,7 +4575,7 @@ return true;
       if(c=='\"')
     break;
       if(c==0) {
-      oo__xmlkey= oo__xmlval= "";
+      oo__xmlkey= oo__xmlval= (char *)"";
 return true;
         }
       read_bufp++;
@@ -4704,7 +4776,7 @@ static inline void oo__switch() {
         ty= tyidold>>60;
         id= ((int64_t)(tyidold & UINT64_C(0xfffffffffffffff)))-
           INT64_C(0x800000000000000);
-        WARNv("wrong order at %s %"PRIi64" in file %s",
+        WARNv("wrong order at %s %Ld in file %s",
           ONAME(ty),id,oo__ifp->filename)
         }  // wrong sequence
       }  // new tyid is valid
@@ -4870,7 +4942,7 @@ static int oo_main() {
   int64_t histime;  // flag mask 16 (see oo__if_t)
   int64_t hiscset;  // flag mask 32 (see oo__if_t)
   uint32_t hisuid;  // flag mask 64
-  char* hisuser;  // flag mask 128
+  string hisuser;  // flag mask 128
   // int64_t rid[3];  // for delta-coding (see oo__if_t)
   #define oo__refM 100000
   int64_t refid[oo__refM];
@@ -5221,7 +5293,8 @@ return 23;
         if(hisver!=0) {  // history information available
           histime= oo__ifp->o5histime+= pbf_sint64(&bufp);
           hiscset= oo__ifp->o5hiscset+= pbf_sint32(&bufp);
-          str_read(&bufp,&sp,&hisuser);
+	  string tmp(sp);
+          str_read(&bufp,tmp,hisuser);
           hisuid= pbf_uint64((byte**)&sp);
           if(!global_drophistory) complete|= 8+16+32+64+128;
           }  // end   history information available
@@ -5299,7 +5372,7 @@ return 23;
               *refide++= ri;
               *reftypee++= rt;
               if(rcomplete<4)  // refrole is missing
-                rr= "";  // assume an empty string as refrole
+                rr= (char*)"";  // assume an empty string as refrole
               *refrolee++= rr;
               }  // end   at least refid and reftype
             rcomplete= 0;
@@ -5364,18 +5437,18 @@ return 23;
 
     // care about possible array overflows
     if(refide>refidee)
-      WARNv("way %"PRIi64" has too many noderefs.\n",id)
+      WARNv("way %Ld has too many noderefs.\n",id)
     if(refide>refidee)
-      WARNv("relation %"PRIi64" has too many refs.\n",id)
+      WARNv("relation %Ld has too many refs.\n",id)
     if(keye>=keyee)
-      WARNv("%s %"PRIi64" has too many key/val pairs.\n",
+      WARNv("%s %Ld has too many key/val pairs.\n",
         ONAME(otype),id)
 
     // check sequence, if necessary
     if(oo_ifn==1 && dependenciesstage!=3) {
       if(otype<=oo_sequencetype &&
           (otype<oo_sequencetype || id<=oo_sequenceid))
-        WARNv("wrong sequence at %s %"PRIi64".\n",ONAME(otype),id)
+        WARNv("wrong sequence at %s %Ld.\n",ONAME(otype),id)
       }
     oo_sequencetype= otype; oo_sequenceid= id;
 
@@ -5400,7 +5473,7 @@ return 23;
         if(!global_dropnodes) {  // not to drop
           if(hisavailable)  // no history information
             wo_node(id,lon,lat,
-              hisver,histime,hiscset,hisuid,hisuser);
+		    hisver,histime,hiscset,hisuid,hisuser.c_str());
           else  // history information available
             wo_node(id,lon,lat,0,0,0,0,"");
           keyp= key; valp= val;
@@ -5430,7 +5503,7 @@ return 23;
           hash_seti(1,id);  // memorize that this way lies inside
         if(!global_dropways) {  // not ways to drop
           if(hisavailable)  // no history information
-            wo_way(id,hisver,histime,hiscset,hisuid,hisuser);
+            wo_way(id,hisver,histime,hiscset,hisuid,hisuser.c_str());
           else  // history information available
             wo_way(id,0,0,0,0,"");
           refidp= refid;
@@ -5496,7 +5569,7 @@ return 24;
           inside= true;
         if(inside) {  // no borders OR at least one node inside
           if(hisavailable)  // no history information
-            wo_relation(id,hisver,histime,hiscset,hisuid,hisuser);
+            wo_relation(id,hisver,histime,hiscset,hisuid,hisuser.c_str());
           else  // history information available
             wo_relation(id,0,0,0,0,"");
           refidp= refid; reftypep= reftype; refrolep= refrole;
@@ -5741,7 +5814,7 @@ return 5;
   // do the work
   r= oo_main();
   if(loglevel>=2) {  // verbose
-    fprintf(stderr,"osmconvert: Number of bytes read: %"PRIu64"\n",
+    fprintf(stderr,"osmconvert: Number of bytes read: %Ld\n",
       read_count());
     if(read_bufp!=NULL && read_bufp<read_bufe)
       fprintf(stderr,"osmconvert: Next bytes to parse:\n"
@@ -5754,7 +5827,7 @@ return 5;
     r= 91;
   if(loglevel>0) {  // verbose mode
     if(oo_sequenceid!=INT64_C(-0x7fffffffffffffff))
-      fprintf(stderr,"osmconvert: Last processed: %s %"PRIu64".\n",
+      fprintf(stderr,"osmconvert: Last processed: %s %Ld.\n",
         ONAME(oo_sequencetype),oo_sequenceid);
     if(r!=0)
       fprintf(stderr,"osmconvert Exit: %i\n",r);
