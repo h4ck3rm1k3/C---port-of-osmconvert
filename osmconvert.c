@@ -406,6 +406,10 @@ const char* helptext=
 "There is NO WARRANTY, to the extent permitted by law.\n"
 "Please send any bug reports to markus.weber@gmx.com\n\n";
 
+#define __STDC_CONSTANT_MACROS 1
+#include <string>
+using namespace std;
+
 #define _FILE_OFFSET_BITS 64
 #include <zlib.h>
 #include <inttypes.h>
@@ -419,7 +423,7 @@ const char* helptext=
 #include <fcntl.h>
 #include <signal.h>
 
-typedef enum {false= 0,true= 1} bool;
+//typedef enum {false= 0,true= 1} bool;
 typedef uint8_t byte;
 typedef unsigned int uint;
 #define isdig(x) isdigit((unsigned char)(x))
@@ -1212,7 +1216,7 @@ return false;
             bep->chain= NULL;
             if(loglevel>=1)
               fprintf(stderr,
-                "+ %i %"PRIi32",%"PRIi32",%"PRIi32",%"PRIi32"\n",
+                "+ %i %i,%i,%i,%i\n",
                 (int)(bep-border__edge),
                 bep->x1,bep->y1,bep->x2,bep->y2);
             bep++;
@@ -1227,7 +1231,7 @@ return false;
           bep->chain= NULL;
           if(loglevel>=1)
             fprintf(stderr,
-              "c %i %"PRIi32",%"PRIi32",%"PRIi32",%"PRIi32"\n",
+              "c %i %i,%i,%i,%i\n",
               (int)(bep-border__edge),bep->x1,bep->y1,bep->x2,bep->y2);
           bep++;
           }  // end   last polygon was not closed
@@ -1255,7 +1259,7 @@ return false;
             bep->chain= NULL;
             if(loglevel>=1)
               fprintf(stderr,
-                "- %i %"PRIi32",%"PRIi32",%"PRIi32",%"PRIi32"\n",
+                "- %i %i,%i,%i,%i\n",
                 (int)(bep-border__edge),
                 bep->x1,bep->y1,bep->x2,bep->y2);
             bep++;
@@ -1292,7 +1296,7 @@ return false;
     while(bep->x1!=nil) {  // for each edge in list
       if(loglevel>=1)
         fprintf(stderr,
-          "> %i %"PRIi32",%"PRIi32",%"PRIi32",%"PRIi32"\n",
+          "> %i %i,%i,%i,%i\n",
           (int)(bep-border__edge),bep->x1,bep->y1,bep->x2,bep->y2);
       /*x1= bep->x1;*/ x2= bep->x2;
       bep2= bep;
@@ -1338,13 +1342,13 @@ return false;
     bep= border__edge;
     while(bep->x1!=nil) {  // for each edge in list
       fprintf(stderr,
-        "> %i %"PRIi32",%"PRIi32",%"PRIi32",%"PRIi32"\n",
+        "> %i %i,%i,%i,%i\n",
         (int)(bep-border__edge),bep->x1,bep->y1,bep->x2,bep->y2);
       bcp= bep->chain;
       while(bcp!=NULL) {  // for each chain link in edge
         bep2= bcp->edge;
         fprintf(stderr,
-          "  %i %"PRIi32",%"PRIi32",%"PRIi32",%"PRIi32"\n",
+          "  %i %i,%i,%i,%i\n",
           (int)(bep2-border__edge),
           bep2->x1,bep2->y1,bep2->x2,bep2->y2);
         bcp= bcp->next;
@@ -2892,7 +2896,7 @@ return 0;
         if(hisuser<pb__strm)  // string index ok
           pb_hisuser= pb__str[hisuser];
         else {  // string index overflow
-          WARNv("node %"PRIi64" user string index overflow: %u>=%i",
+          WARNv("node %Ld user string index overflow: %u>=%i",
             pb_id,hisuser,pb__strm)
           hisuser= 0; pb_hisuser= "";
           }
@@ -2912,7 +2916,7 @@ return 0;
         if(hisuser<pb__strm)  // string index ok
           pb_hisuser= pb__str[hisuser];
         else {  // string index overflow
-          WARNv("way %"PRIi64" user string index overflow: %u>=%i",
+          WARNv("way %Ld user string index overflow: %u>=%i",
             pb_id,hisuser,pb__strm)
           hisuser= 0; pb_hisuser= "";
           }
@@ -2928,7 +2932,7 @@ return 0;
         if(hisuser<pb__strm)  // string index ok
           pb_hisuser= pb__str[hisuser];
         else {  // string index overflow
-          WARNv("rel %"PRIi64" user string index overflow: %u>=%i",
+          WARNv("rel %Ld user string index overflow: %u>=%i",
             pb_id,hisuser,pb__strm)
           hisuser= 0; pb_hisuser= "";
           }
@@ -4878,7 +4882,7 @@ static void pw_header(bool bboxvalid,
     pw__obj_add_str(s);
     }  // file timestamp given
   pw__obj_add_id2(0x8201);  // S 16 'writingprogram'
-  pw__obj_add_str("osmconvert "VERSION);
+  pw__obj_add_str("osmconvert " VERSION);
   pw__obj_add_id2(0x8a01);  // S 17 'source'
   pw__obj_add_str("http://www.openstreetmap.org/api/0.6");
   /* write 'raw_size' into hierarchy object's header */ {
@@ -6749,11 +6753,11 @@ static char* wo__xmlclosetag= NULL;  // close tag for XML output;
 static bool wo__xmlshorttag= false;
   // write the short tag ("/>") instead of the long tag;
 #define wo__CLOSE {  /* close the newest written object; */ \
-  if(wo__xmlclosetag!=NULL) { if(wo__xmlshorttag) write_str("\"/>"NL); \
+  if(wo__xmlclosetag!=NULL) { if(wo__xmlshorttag) write_str("\"/>" NL); \
     else write_str(wo__xmlclosetag); \
     wo__xmlclosetag= NULL; wo__xmlshorttag= false; } }
 #define wo__CONTINUE {  /* continue an XML object */ \
-  if(wo__xmlshorttag) { write_str("\">"NL); wo__xmlshorttag= false; \
+  if(wo__xmlshorttag) { write_str("\">" NL); wo__xmlshorttag= false; \
       /* from now on: long close tag necessary; */ } }
 static int wo__lastaction= 0;  // last action tag which has been set;
   // 0: no action tag; 1: "create"; 2: "modify"; 3: "delete";
@@ -6871,9 +6875,9 @@ static inline void wo__action(int action) {
   // action: 0: no action tag; 1: "create"; 2: "modify"; 3: "delete";
   //         caution: there is no check for validity of this parameter;
   static const char* starttag[]=
-    {"","<create>"NL,"<modify>"NL,"<delete>"NL};
+    {"","<create>" NL,"<modify>" NL,"<delete>" NL};
   static const char* endtag[]=
-    {"","</create>"NL,"</modify>"NL,"</delete>"NL};
+    {"","</create>" NL,"</modify>" NL,"</delete>" NL};
 
   if(global_outosc && action!=wo__lastaction) {  // there was a change
     write_str(endtag[wo__lastaction]);  // end last action
@@ -6934,16 +6938,17 @@ return;
     }
   // here: XML
   if(wo__format!=14)
-    write_str("<?xml version=\'1.0\' encoding=\'UTF-8\'?>"NL);
+    write_str("<?xml version=\'1.0\' encoding=\'UTF-8\'?>" NL);
   else  // Osmium XML
-    write_str("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"NL);
+    write_str("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" NL);
   if(global_outosc)
       write_str("<osmChange version=\"0.6\"");
   else
       write_str("<osm version=\"0.6\"");
   switch(wo__format) {  // depending on output format
   case 11:  // native XML
-    write_str(" generator=\"osmconvert "VERSION"\"");
+    write_str(" generator=\"osmconvert " VERSION 
+"\"");
     break;
   case 12:  // pbf2osm XML
     write_str(" generator=\"pbf2osm\"");
@@ -6960,7 +6965,7 @@ return;
     write_str(" timestamp=\""); write_timestamp(timestamp);
     write_char('\"');
     }
-  write_str(">"NL);
+  write_str(">" NL);
   if(wo__format!=12) {  // bbox may be written
     if(border_active)  // borders are to be applied
       border_querybox(&x1,&y1,&x2,&y2);
@@ -6973,7 +6978,7 @@ return;
         write_str(","); write_sfix7(x1);
         write_str(","); write_sfix7(y2);
         write_str(","); write_sfix7(x2);
-        write_str("\" origin=\"0.40\"/>"NL);
+        write_str("\" origin=\"0.40\"/>" NL);
         }  // Osmosis
       else {  // not Osmosis
         // <bounds minlat="53.8" minlon="10.5" maxlat="54."
@@ -6982,7 +6987,7 @@ return;
         write_str("\" minlon=\""); write_sfix7(x1);
         write_str("\" maxlat=\""); write_sfix7(y2);
         write_str("\" maxlon=\""); write_sfix7(x2);
-        write_str("\"/>"NL);
+        write_str("\"/>" NL);
         }  // not Osmosis
       }
     }  // end   bbox may be written
@@ -7001,9 +7006,9 @@ static void wo_end() {
   case 14:  // Osmium XML
     wo__CLOSE
     wo__action(0);
-    write_str(global_outosc? "</osmChange>"NL: "</osm>"NL);
+    write_str(global_outosc? "</osmChange>" NL: "</osm>" NL);
     if(wo__format>=12)
-      write_str("<!--End of emulated output.-->"NL);
+      write_str("<!--End of emulated output.-->" NL);
     break;
   case 21:  // csv
     csv_write();
@@ -7114,21 +7119,21 @@ return;
     write_str("\" lat=\""); write_sfix7(lat);
     write_str("\" lon=\""); write_sfix7(lon);
     wo__author(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "\t</node>"NL;  // preset close tag
+    wo__xmlclosetag= "\t</node>" NL;  // preset close tag
     break;
   case 12:  // pbf2osm XML
     write_str("\t<node id=\""); write_sint64(id);
     write_str("\" lat=\""); write_sfix7o(lat);
     write_str("\" lon=\""); write_sfix7o(lon);
     wo__author(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "\t</node>"NL;  // preset close tag
+    wo__xmlclosetag= "\t</node>" NL;  // preset close tag
     break;
   case 13:  // Osmosis XML
     write_str("  <node id=\""); write_sint64(id);
     wo__author(hisver,histime,hiscset,hisuid,hisuser);
     write_str("\" lat=\""); write_sfix7(lat);
     write_str("\" lon=\""); write_sfix7(lon);
-    wo__xmlclosetag= "  </node>"NL;  // preset close tag
+    wo__xmlclosetag= "  </node>" NL;  // preset close tag
     break;
   case 14:  // Osmium XML
     write_str("  <node id=\""); write_sint64(id);
@@ -7139,7 +7144,7 @@ return;
     else lat= (lat-5)/10;
     write_str("\" lon=\""); write_sfix6o(lon);
     write_str("\" lat=\""); write_sfix6o(lat);
-    wo__xmlclosetag= "  </node>"NL;  // preset close tag
+    wo__xmlclosetag= "  </node>" NL;  // preset close tag
     break;
     }  // end   depending on output format
   wo__xmlshorttag= true;  // (default)
@@ -7204,18 +7209,18 @@ return;
   case 11:  // native XML
     write_str("\t<way id=\""); write_sint64(id);
     wo__author(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "\t</way>"NL;  // preset close tag
+    wo__xmlclosetag= "\t</way>" NL;  // preset close tag
     break;
   case 12:  // pbf2osm XML
     write_str("\t<way id=\""); write_sint64(id);
     wo__author(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "\t</way>"NL;  // preset close tag
+    wo__xmlclosetag= "\t</way>" NL;  // preset close tag
     break;
   case 13:  // Osmosis XML
   case 14:  // Osmium XML
     write_str("  <way id=\""); write_sint64(id);
     wo__author(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "  </way>"NL;  // preset close tag
+    wo__xmlclosetag= "  </way>" NL;  // preset close tag
     break;
     }  // end   depending on output format
   wo__xmlshorttag= true;  // (default)
@@ -7280,18 +7285,18 @@ return;
   case 11:  // native XML
     write_str("\t<relation id=\""); write_sint64(id);
     wo__author(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "\t</relation>"NL;  // preset close tag
+    wo__xmlclosetag= "\t</relation>" NL;  // preset close tag
     break;
   case 12:  // pbf2osm XML
     write_str("\t<relation id=\""); write_sint64(id);
     wo__author(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "\t</relation>"NL;  // preset close tag
+    wo__xmlclosetag= "\t</relation>" NL;  // preset close tag
     break;
   case 13:  // Osmosis XML
   case 14:  // Osmium XML
     write_str("  <relation id=\""); write_sint64(id);
     wo__author(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "  </relation>"NL;  // preset close tag
+    wo__xmlclosetag= "  </relation>" NL;  // preset close tag
     break;
     }  // end   depending on output format
   wo__xmlshorttag= true;  // (default)
@@ -7338,7 +7343,7 @@ return;
     if(global_fakelonlat)
       write_str("\" lat=\"0\" lon=\"0");
     wo__author(hisver,histime,hiscset,hisuid,hisuser);
-    wo__xmlclosetag= "\"/>"NL;  // preset close tag
+    wo__xmlclosetag= "\"/>" NL;  // preset close tag
     wo__xmlshorttag= false;  // (default)
     wo__CLOSE  // write close tag
     }  // end   .osm (.osc)
@@ -7363,12 +7368,12 @@ return;
   case 11:  // native XML
   case 12:  // pbf2osm XML
     write_str("\t\t<nd ref=\""); write_sint64(noderef);
-    write_str("\"/>"NL);
+    write_str("\"/>" NL);
     break;
   case 13:  // Osmosis XML
   case 14:  // Osmium XML
     write_str("    <nd ref=\""); write_sint64(noderef);
-    write_str("\"/>"NL);
+    write_str("\"/>" NL);
     break;
     }  // end   depending on output format
   }  // end   wo_noderef()
@@ -7405,7 +7410,7 @@ return;
       write_str("\t\t<member type=\"relation\" ref=\"");
     write_sint64(refid);
     write_str("\" role=\""); write_xmlstr(refrole);
-    write_str("\"/>"NL);
+    write_str("\"/>" NL);
     break;
   case 13:  // Osmosis XML
   case 14:  // Osmium XML
@@ -7417,7 +7422,7 @@ return;
       write_str("    <member type=\"relation\" ref=\"");
     write_sint64(refid);
     write_str("\" role=\""); write_xmlmnstr(refrole);
-    write_str("\"/>"NL);
+    write_str("\"/>" NL);
     break;
     }  // end   depending on output format
   }  // end   wo_ref()
@@ -7450,18 +7455,18 @@ return;
     write_str("\t\t<tag k=\""); write_xmlstr(key);
     write_str("\" v=\"");
 write_xmlstr(val);
-    write_str("\"/>"NL);
+    write_str("\"/>" NL);
     break;
   case 12:  // pbf2osm XML
     write_str("\t\t<tag k=\""); write_xmlstr(key);
     write_str("\" v=\""); write_xmlstr(val);
-    write_str("\" />"NL);
+    write_str("\" />" NL);
     break;
   case 13:  // Osmosis XML
   case 14:  // Osmium XML
     write_str("    <tag k=\""); write_xmlmnstr(key);
     write_str("\" v=\""); write_xmlmnstr(val);
-    write_str("\"/>"NL);
+    write_str("\"/>" NL);
     break;
     }  // end   depending on output format
   }  // end   wo_node_keyval()
@@ -7487,18 +7492,18 @@ return;
     write_str("\t\t<tag k=\""); write_xmlstr(key);
     write_str("\" v=\"");
 write_xmlstr(val);
-    write_str("\"/>"NL);
+    write_str("\"/>" NL);
     break;
   case 12:  // pbf2osm XML
     write_str("\t\t<tag k=\""); write_xmlstr(key);
     write_str("\" v=\""); write_xmlstr(val);
-    write_str("\" />"NL);
+    write_str("\" />" NL);
     break;
   case 13:  // Osmosis XML
   case 14:  // Osmium XML
     write_str("    <tag k=\""); write_xmlmnstr(key);
     write_str("\" v=\""); write_xmlmnstr(val);
-    write_str("\"/>"NL);
+    write_str("\"/>" NL);
     break;
     }  // end   depending on output format
   }  // end   wo_wayrel_keyval()
@@ -8403,12 +8408,12 @@ static inline void oo__switch() {
         ty= tyidold>>60;
         id= ((int64_t)(tyidold & UINT64_C(0xfffffffffffffff)))-
           INT64_C(0x800000000000000);
-        WARNv("wrong order at %s %"PRIi64" in file %s",
+        WARNv("wrong order at %s %Ld in file %s",
           ONAME(ty),id,oo__ifp->filename)
         ty= oo__ifp->tyid>>60;
         id= ((int64_t)(oo__ifp->tyid & UINT64_C(0xfffffffffffffff)))-
           INT64_C(0x800000000000000);
-        WARNv("next object is %s %"PRIi64,ONAME(ty),id)
+        WARNv("next object is %s %Ld",ONAME(ty),id)
         }  // wrong sequence
       }  // new tyid is valid
     }  // end   handle of current input file is valid
@@ -8602,7 +8607,7 @@ static void* oo__malloc(size_t size) {
 
   mp= malloc(size);
   if(mp==NULL) {
-    PERRv("cannot allocate %"PRIi64" bytes of memory.",(int64_t)size);
+    PERRv("cannot allocate %Ld bytes of memory.",(int64_t)size);
     exit(1);
     }
   oo__malloc_p[oo__malloc_n++]= mp;
@@ -9548,9 +9553,9 @@ return 23;
 
     // care about possible array overflows
     if(refide>=refidee)
-      PERRv("%s %"PRIi64" has too many refs.",ONAME(otype),id)
+      PERRv("%s %Ld has too many refs.",ONAME(otype),id)
     if(keye>=keyee)
-      PERRv("%s %"PRIi64" has too many key/val pairs.",
+      PERRv("%s %Ld has too many key/val pairs.",
         ONAME(otype),id)
 
     // care about diffs and sequence
@@ -9594,9 +9599,9 @@ return 23;
             (otype<oo_sequencetype || id<oo_sequenceid ||
             (oo_ifn>1 && id<=oo_sequenceid))) {
           oo__error= 92;
-          WARNv("wrong sequence at %s %"PRIi64,
+          WARNv("wrong sequence at %s %Ld",
             ONAME(oo_sequencetype),oo_sequenceid)
-          WARNv("next object is %s %"PRIi64,ONAME(otype),id)
+          WARNv("next object is %s %Ld",ONAME(otype),id)
           }
         }  // dependencystage>=32
       }  // no diff contents is to be considered
@@ -9915,7 +9920,7 @@ return 26;
         if(global_alltonodes) {
           // check id range
           if(id>=global_otypeoffset05 || id<=-global_otypeoffset05)
-            WARNv("node id %"PRIi64
+            WARNv("node id %Ld"
               " out of range. Increase --object-type-offset",id)
           posi_set(id,lon,lat);  // store position
           }
@@ -9962,7 +9967,7 @@ return 26;
 
             // check id range
             if(id>=global_otypeoffset05 || id<=-global_otypeoffset05)
-              WARNv("way id %"PRIi64
+              WARNv("way id %Ld"
                 " out of range. Increase --object-type-offset",id)
 
             // determine the center of the way's bbox
@@ -10168,7 +10173,7 @@ return 26;
               // 33:     write each relation which has a flag in ht
               //           to output; use temporary .o5m file as input;
             if(id>=global_otypeoffset05 || id<=-global_otypeoffset05)
-              WARNv("relation id %"PRIi64
+              WARNv("relation id %Ld"
                 " out of range. Increase --object-type-offset",id)
             posi_get(id+global_otypeoffset20);  // get coorinates
             if(posi_xy!=NULL && posi_xy[0]!=posi_nil) {
@@ -10277,40 +10282,40 @@ return 26;
       write_createsfix7o(statistics.lat_max,coord);
       fprintf(fi,"lat max: %s\n",coord);
       }
-    fprintf(fi,"nodes: %"PRIi64"\n",statistics.nodes);
-    fprintf(fi,"ways: %"PRIi64"\n",statistics.ways);
-    fprintf(fi,"relations: %"PRIi64"\n",statistics.relations);
+    fprintf(fi,"nodes: %Ld\n",statistics.nodes);
+    fprintf(fi,"ways: %Ld\n",statistics.ways);
+    fprintf(fi,"relations: %Ld\n",statistics.relations);
     if(statistics.node_id_min!=0)
-      fprintf(fi,"node id min: %"PRIi64"\n",statistics.node_id_min);
+      fprintf(fi,"node id min: %Ld\n",statistics.node_id_min);
     if(statistics.node_id_max!=0)
-      fprintf(fi,"node id max: %"PRIi64"\n",statistics.node_id_max);
+      fprintf(fi,"node id max: %Ld\n",statistics.node_id_max);
     if(statistics.way_id_min!=0)
-      fprintf(fi,"way id min: %"PRIi64"\n",statistics.way_id_min);
+      fprintf(fi,"way id min: %Ld\n",statistics.way_id_min);
     if(statistics.way_id_max!=0)
-      fprintf(fi,"way id max: %"PRIi64"\n",statistics.way_id_max);
+      fprintf(fi,"way id max: %Ld\n",statistics.way_id_max);
     if(statistics.relation_id_min!=0)
-      fprintf(fi,"relation id min: %"PRIi64"\n",
+      fprintf(fi,"relation id min: %Ld\n",
         statistics.relation_id_min);
     if(statistics.relation_id_max!=0)
-      fprintf(fi,"relation id max: %"PRIi64"\n",
+      fprintf(fi,"relation id max: %Ld\n",
         statistics.relation_id_max);
     if(statistics.keyval_pairs_max!=0) {
-      fprintf(fi,"keyval pairs max: %"PRIi32"\n",
+      fprintf(fi,"keyval pairs max: %i\n",
         statistics.keyval_pairs_max);
-      fprintf(fi,"keyval pairs max object: %s %"PRIi64"\n",
+      fprintf(fi,"keyval pairs max object: %s %Ld\n",
         ONAME(statistics.keyval_pairs_otype),
         statistics.keyval_pairs_oid);
       }
     if(statistics.noderefs_max!=0) {
-      fprintf(fi,"noderefs max: %"PRIi32"\n",
+      fprintf(fi,"noderefs max: %i\n",
         statistics.noderefs_max);
-      fprintf(fi,"noderefs max object: way %"PRIi64"\n",
+      fprintf(fi,"noderefs max object: way %Ld\n",
         statistics.noderefs_oid);
       }
     if(statistics.relrefs_max!=0) {
-      fprintf(fi,"relrefs max: %"PRIi32"\n",
+      fprintf(fi,"relrefs max: %i\n",
         statistics.relrefs_max);
-      fprintf(fi,"relrefs max object: relation %"PRIi64"\n",
+      fprintf(fi,"relrefs max object: relation %Ld\n",
         statistics.relrefs_oid);
       }
     }  // print statistics
@@ -10345,7 +10350,7 @@ static bool assistant(int* argcp,char*** argvp) {
     };
   static const char* talk_intro[langM]= {
     "\n"
-    "osmconvert "VERSION"\n"
+    "osmconvert " VERSION "\n"
     "\n"
     "Converts .osm, .o5m, .pbf, .osc, .osh files, applies changes\n"
     "of .osc, .o5c, .osh files and sets limiting borders.\n"
@@ -10358,7 +10363,7 @@ static bool assistant(int* argcp,char*** argvp) {
     "enter \"a\" (press key E and hit <Return>).\n"
     ,
     "\n"
-    "osmconvert "VERSION"\n"
+    "osmconvert " VERSION "\n"
     "\n"
     "Konvertiert .osm-, .o5m-, .pbf-, .osc- und .osh-Dateien,\n"
     "spielt Updates von .osc-, .o5c- und .osh-Dateien ein und\n"
@@ -10607,7 +10612,7 @@ static bool assistant(int* argcp,char*** argvp) {
         DD(talk_section)
         if(no_error) {
           DD(talk_finished)
-          fprintf(stderr,"%"PRIi64"s.\n",
+          fprintf(stderr,"%Lds.\n",
             (int64_t)(time(NULL)-start_time));
           DD(talk_finished_file)
           fprintf(stderr,"  %s",output_file+3);
@@ -10621,7 +10626,7 @@ static bool assistant(int* argcp,char*** argvp) {
         DD(talk_section)
         if(no_error) {
           DD(talk_finished)
-          fprintf(stderr,"%"PRIi64"s.\n",
+          fprintf(stderr,"%Lds.\n",
             (int64_t)(time(NULL)-start_time));
           }
         else
@@ -11258,9 +11263,8 @@ return 0;
     if((strcmp(a,"-v")==0 || strcmp(a,"--verbose")==0 ||
         strzcmp(a,"-v=")==0 || strzcmp(a,"--verbose=")==0) &&
         loglevel==0) {  // test mode - if not given already
-      char* sp;
-
-      sp= strchr(a,'=');
+      const char* sp;
+      sp= strchr(a,(int)'=');
       if(sp!=NULL) loglevel= sp[1]-'0'; else loglevel= 1;
       if(loglevel<1) loglevel= 1;
       if(loglevel>MAXLOGLEVEL) loglevel= MAXLOGLEVEL;
@@ -11340,7 +11344,7 @@ return 2;
     uint32_t zlibflags;
     zlibflags= zlibCompileFlags();
     if(loglevel>=2) {
-      PINFOv("zlib "ZLIB_VERSION" flags: %08"PRIx32"",zlibflags)
+      PINFOv("zlib " ZLIB_VERSION " flags: %08x",zlibflags)
       }
     //if((zlibflags&0xc0) <= 0x40)
       //WARN("you are using the 32 bit zlib. Hence file size max. 2 GB.")
@@ -11404,7 +11408,7 @@ return 7;
     if(!global_outosc && !global_outosh && !global_outo5c)
       global_outosc= true;
     }  // end   diff
-  sprintf(strchr(global_tempfilename,0),".%"PRIi64,(int64_t)getpid());
+  sprintf(strchr(global_tempfilename,0),".%Ld",(int64_t)getpid());
   if(loglevel>=2)
     fprintf(stderr,"Tempfiles: %s.*\n",global_tempfilename);
   if(global_alltonodes)
@@ -11430,7 +11434,7 @@ return 7;
     }
   if(loglevel>0) {  // verbose mode
     if(oo_sequenceid!=INT64_C(-0x7fffffffffffffff))
-      fprintf(stderr,"osmconvert: Last processed: %s %"PRIu64".\n",
+      fprintf(stderr,"osmconvert: Last processed: %s %Lu.\n",
         ONAME(oo_sequencetype),oo_sequenceid);
     if(r!=0)
       fprintf(stderr,"osmconvert Exit: %i\n",r);
