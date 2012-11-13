@@ -1,4 +1,10 @@
-static inline char* uint32toa(uint32_t v,char* s) {
+#include <ctime>
+#include <stdint.h>
+#include <string.h>
+#include <unistd.h>
+#include "util.h"
+
+char* uint32toa(uint32_t v,char* s) {
   // convert uint32_t integer into string;
   // v: long integer value to convert;
   // return: s;
@@ -40,7 +46,7 @@ static inline char* int64toa(int64_t v,char* s) {
   return s;
   }  // end   int64toa()
 
-static inline char *stpcpy0(char *dest, const char *src) {
+char *stpcpy0(char *dest, const char *src) {
   // redefinition of C99's stpcpy() because it's missing in MinGW,
   // and declaration in Linux seems to be wrong;
   while(*src!=0)
@@ -49,7 +55,11 @@ static inline char *stpcpy0(char *dest, const char *src) {
   return dest;
   }  // end stpcpy0()
 
-static inline char *strmcpy(char *dest, const char *src, size_t maxlen) {
+char* strMcpy(const char* d,const char* s ) {
+  return strmcpy((d),(s),sizeof(d));
+}
+
+char *strmcpy(char *dest, const char *src, size_t maxlen) {
   // similar to strcpy(), this procedure copies a character string;
   // here, the length is cared about, i.e. the target string will
   // be limited in case it is too long;
@@ -69,9 +79,9 @@ return dest;
   *d= 0;
   return dest;
   }  // end   strmcpy()
-#define strMcpy(d,s) strmcpy((d),(s),sizeof(d))
+//#define strMcpy(d,s) strmcpy((d),(s),sizeof(d))
 
-static inline char *stpmcpy(char *dest, const char *src, size_t maxlen) {
+ char *stpmcpy(char *dest, const char *src, size_t maxlen) {
   // similar to strmcpy(), this procedure copies a character string;
   // however, it returns the address of the destination string's
   // terminating zero character;
@@ -88,7 +98,7 @@ return dest;
   }  // end stpmcpy()
 #define stpMcpy(d,s) stpmcpy(d,s,sizeof(d))
 
-static inline int strzcmp(const char* s1,const char* s2) {
+ int strzcmp(const char* s1,const char* s2) {
   // similar to strcmp(), this procedure compares two character strings;
   // here, the number of characters which are to be compared is limited
   // to the length of the second string;
@@ -107,7 +117,7 @@ static inline int strzcmp(const char* s1,const char* s2) {
   return *(unsigned char*)s1 < *(unsigned char*)s2? -1: 1;
   }  // end   strzcmp()
 
-static inline int strzlcmp(const char* s1,const char* s2) {
+ int strzlcmp(const char* s1,const char* s2) {
   // similar to strzcmp(), this procedure compares two character strings;
   // and accepts the first string to be longer than the second;
   // other than strzcmp(), this procedure returns the length of s2[] in
@@ -127,7 +137,7 @@ static inline int strzlcmp(const char* s1,const char* s2) {
   return 0;
   }  // end   strzlcmp()
 
-static inline int strycmp(const char* s1,const char* s2) {
+ int strycmp(const char* s1,const char* s2) {
   // similar to strcmp(), this procedure compares two character strings;
   // here, both strings are end-aligned;
   // not more characters will be compared than are existing in string s2;
@@ -146,9 +156,12 @@ return 1;
   return *(unsigned char*)s1 < *(unsigned char*)s2? -1: 1;
   }  // end   strycmp()
 
-static inline bool file_exists(const char* file_name) {
+bool file_exists(const char* file_name) {
   // query if a file exists;
   // file_name[]: name of the file in question;
   // return: the file exists;
   return access(file_name,R_OK)==0;
-  }  // file_exists()
+}  // file_exists()
+
+
+
