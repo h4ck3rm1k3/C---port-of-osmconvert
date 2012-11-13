@@ -1,5 +1,4 @@
 int strzcmp(const char* s1,const char* s2);
-int strMcpy(const char* s1,const char* s2 );
 int strycmp(const char* s1,const char* s2);
 bool file_exists(const char* file_name);
 char *stpcpy0(char *dest, const char *src);
@@ -22,7 +21,7 @@ void PINFOv2(const char * fmt, unsigned int arg);
 
 time_t oo__strtimetosint64(const char *);
 long long int oo__strtosint64(const char *);
-void strmcpy(const char *, const char * ,size_t size);
+char * strmcpy(const char *, const char * ,size_t size);
 
 bool border_box(const char *);
 bool border_file(const char *);
@@ -43,3 +42,5 @@ void write_error();
 int64_t oo_sequenceid();
 int oo_sequencetype();
 const char * ONAME(int);
+
+

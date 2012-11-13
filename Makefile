@@ -1,10 +1,18 @@
 all : osmconvert 
 
-osmconvert.o : osmconvert.c
-	g++ -save-temps -std=c++0x osmconvert.c -c -o osmconvert.o
+CXX=g++
+CXXFLAGS= -save-temps -std=c++0x
 
-osmconvert : osmconvert.o
-	g++   osmconvert.o -lz -o osmconvert
+#CC=g++
+#CFLAGS= -save-temps -std=c++0x
+
+osmconvert.o : osmconvert.cpp
+util.o : util.cpp
+global.o : global.cpp
+
+osmconvert : osmconvert.o util.o global.o process.o oo.o
+
+
 
 a.osm : osmconvert a.pbf
 	./osmconvert --drop-history a.pbf >a.osm
