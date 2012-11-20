@@ -424,9 +424,6 @@ using namespace std;
 #include <signal.h>
 
 //typedef enum {false= 0,true= 1} bool;
-typedef uint8_t byte;
-typedef unsigned int uint;
-#define isdig(x) isdigit((unsigned char)(x))
 static int loglevel= 0;  // logging to stderr;
   // 0: no logging; 1: small logging; 2: normal logging;
   // 3: extended logging;
@@ -1535,11 +1532,18 @@ return 7;
   // do the work
   r= oo_main();
   if(loglevel>=2) {  // verbose
-    if(read->bufp!=NULL && read->bufp<read->bufe)
+    if(read->bufp() !=NULL && read->bufp() <read->bufe()
+)
       fprintf(stderr,"osmconvert: Next bytes to parse:\n"
         "  %.02X %.02X %.02X %.02X %.02X %.02X %.02X %.02X\n",
-        read->bufp[0],read->bufp[1],read->bufp[2],read->bufp[3],
-        read->bufp[4],read->bufp[5],read->bufp[6],read->bufp[7]);
+	      read->bufc(0),
+	      read->bufc(1),
+	      read->bufc(2),
+	      read->bufc(3),
+	      read->bufc(4),
+	      read->bufc(5),
+	      read->bufc(6),
+	      read->bufc(7));
     }  // verbose
   write_flush();
   if(hash_queryerror()!=0)

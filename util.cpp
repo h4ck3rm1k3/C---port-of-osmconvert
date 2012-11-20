@@ -1,7 +1,6 @@
-#include <ctime>
-#include <stdint.h>
-#include <string.h>
-#include <unistd.h>
+
+#include "stdinc.hpp"
+#include "read.hpp"
 #include "util.h"
 
 char* uint32toa(uint32_t v,char* s) {

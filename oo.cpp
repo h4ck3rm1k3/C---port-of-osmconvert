@@ -1,6 +1,16 @@
 //------------------------------------------------------------
 // Module oo_   osm to osm module
 //------------------------------------------------------------
+#include "stdinc.hpp"
+#include "obj_relref.hpp"
+#include "osm_hash.hpp"
+#include "osm_border.h"
+#include "oo.h"
+#include "read.hpp"
+#include "str.hpp"
+#include <vector>
+#include "process.hpp"
+#include "util.h"
 
 // this module provides procedures which read osm objects,
 // process them and write them as osm objects, using module wo_;
@@ -63,7 +73,7 @@ static void oo__rrprocessing(int* maxrewindp) {
     }  // end   for every recursion
   }  // end   oo__rrprocessing()
 
-static byte oo__whitespace[]= {
+ byte oo__whitespace[]= {
   0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,  // HT LF VT FF CR
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  // SPC
@@ -81,7 +91,7 @@ static byte oo__whitespace[]= {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 #define oo__ws(c) (oo__whitespace[(byte)(c)])
-static byte oo__whitespacenul[]= {
+ byte oo__whitespacenul[]= {
   1,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,  // NUL HT LF VT FF CR
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,  // SPC /
@@ -99,7 +109,7 @@ static byte oo__whitespacenul[]= {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 #define oo__wsnul(c) (oo__whitespacenul[(byte)(c)])
-static byte oo__letter[]= {
+ byte oo__letter[]= {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -118,7 +128,7 @@ static byte oo__letter[]= {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 #define oo__le(c) (oo__letter[(byte)(c)])
 
-static const uint8_t* oo__hexnumber= (uint8_t*)
+ const uint8_t* oo__hexnumber= (uint8_t*)
   // convert a hex character to a number
   "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
   "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
@@ -137,7 +147,7 @@ static const uint8_t* oo__hexnumber= (uint8_t*)
   "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
   "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
 
-static inline uint32_t oo__strtouint32(const char* s) {
+ inline uint32_t oo__strtouint32(const char* s) {
   // read a number and convert it to an unsigned 32-bit integer;
   // return: number;
   int32_t i;
@@ -154,7 +164,7 @@ static inline uint32_t oo__strtouint32(const char* s) {
   }  // end   oo__strtouint32()
 
 #if 0  // presently unused
-static inline int32_t oo__strtosint32(const char* s) {
+ inline int32_t oo__strtosint32(const char* s) {
   // read a number and convert it to a signed 64-bit integer;
   // return: number;
   int sign;
@@ -173,7 +183,7 @@ static inline int32_t oo__strtosint32(const char* s) {
   }  // end   oo__strtosint32()
 #endif
 
-static inline int64_t oo__strtosint64(const char* s) {
+ inline int64_t oo__strtosint64(const char* s) {
   // read a number and convert it to a signed 64-bit integer;
   // return: number;
   int sign;
@@ -191,16 +201,16 @@ static inline int64_t oo__strtosint64(const char* s) {
   return i*sign;
   }  // end   oo__strtosint64()
 
-static const int32_t oo__nildeg= 2000000000L;
+ const int32_t oo__nildeg= 2000000000L;
 
-static inline int32_t oo__strtodeg(char* s) {
+ inline int32_t oo__strtodeg(char* s) {
   // read a number which represents a degree value and
   // convert it to a fixpoint number;
   // s[]: string with the number between -180 and 180,
   //      e.g. "-179.99", "11", ".222";
   // return: number in 10 millionth degrees;
   //         =='oo__nildeg': syntax error;
-  static const long di[]= {10000000L,10000000L,1000000L,100000L,
+   const long di[]= {10000000L,10000000L,1000000L,100000L,
     10000L,1000L,100L,10L,1L};
   static const long* dig= di+1;
   int sign;
@@ -225,7 +235,7 @@ return border__nil;
   return k;
   }  // end   oo__strtodeg()
 
-static inline int64_t oo__strtimetosint64(const char* s) {
+int64_t oo__strtimetosint64(const char* s) {
   // read a timestamp in OSM format, e.g.: "2010-09-30T19:23:30Z",
   // and convert it to a signed 64-bit integer;
   // also allowed: relative time to NOW, e.g.: "NOW-86400",
@@ -277,7 +287,7 @@ return timegm(&tm);
     }  // regular timestamp
   }  // end   oo__strtimetosint64()
 
-static inline void oo__xmltostr(char* s) {
+ void oo__xmltostr(char* s) {
   // read an xml string and convert is into a regular UTF-8 string,
   // for example: "Mayer&apos;s" -> "Mayer's";
   char* t;  // pointer in overlapping target string
@@ -357,7 +367,7 @@ static bool oo__xmlheadtag;  // currently, we are inside an xml start tag,
   // (the second example is a so-called short tag)
 static char* oo__xmlkey,*oo__xmlval;  // return values of oo__xmltag
 
-static inline bool oo__xmltag() {
+ bool oo__xmltag(Read & read) {
   // read the next xml key/val and return them both;
   // due to performance reasons, global and module global variables
   // are used;
@@ -371,19 +381,20 @@ static inline bool oo__xmltag() {
   char c;
 
   for(;;) {  // until break
-    while(!oo__wsnul(*read_bufp)) read_bufp++;
+    while(!oo__wsnul(*read.bufp())) read.bufpinc();
       // find next whitespace or null character or '/'
-    while(oo__ws(*read_bufp)) read_bufp++;
+    while(oo__ws(*read.bufp())) read.bufpinc();
       // find first character after the whitespace(s)
-    c= *read_bufp;
+    c= *read.bufp();
     if(c==0) {
-      oo__xmlkey= oo__xmlval= "";
+      oo__xmlkey= oo__xmlval= (char*)"";
 return true;
       }
     else if(c=='/') {
-      oo__xmlkey= oo__xmlval= "";
-      c= *++read_bufp;
-      read_bufp++;
+      oo__xmlkey= oo__xmlval= (char*)"";
+      c= *read.bufp();
+      read.bufpinc();
+      read.bufpinc();
       if(c=='>') {  // short tag ends here
         if(oo__xmlheadtag) {
             // this ending short tag is the object's tag
@@ -396,38 +407,40 @@ return false;
       }
     else if(c=='<') {
       oo__xmlheadtag= false;
-      if(*++read_bufp=='/' && (
-          (c= *++read_bufp)=='n' || c=='w' || c=='r') ) {
+      read.bufpinc();
+      if(*read.bufp()=='/' && (
+			       (c= *read.bufp())=='n' || c=='w' || c=='r') ) {
         // this has been long tag which is ending now
-        while(!oo__wsnul(*read_bufp)) read_bufp++;
+        while(!oo__wsnul(*read.bufp())) read.bufpinc();
           // find next whitespace
-        oo__xmlkey= oo__xmlval= "";
+        oo__xmlkey= oo__xmlval= (char*)"";
 return true;
         }
   continue;
       }
-    oo__xmlkey= (char*)read_bufp;
-    while(oo__le(*read_bufp)) read_bufp++;
-    if(*read_bufp!='=') {
-      oo__xmlkey= "";
+    oo__xmlkey= (char*)read.bufp();
+    while(oo__le(*read.bufp())) read.bufpinc();
+    if(*read.bufp()!='=') {
+      oo__xmlkey= (char*)"";
   continue;
       }
-    *read_bufp++= 0;
-    if(*read_bufp!='\"' && *read_bufp!='\'')
+    *read.bufpinc()= 0;
+    read.bufpsetnull();
+    if(*read.bufp()!='\"' && *read.bufp()!='\'')
   continue;
-    xmldelim= (char)*read_bufp;
-    oo__xmlval= (char*)(++read_bufp);
+    xmldelim= (char)*read.bufp();
+    oo__xmlval= (char*)(read.bufpinc());
     for(;;) {
-      c= *read_bufp;
+      c= *read.bufp();
       if(c==xmldelim)
     break;
       if(c==0) {
-      oo__xmlkey= oo__xmlval= "";
+	oo__xmlkey= oo__xmlval= (char*)"";
 return true;
         }
-      read_bufp++;
+      read.bufpinc();
       }
-    *read_bufp++= 0;
+    read.bufpsetnull();
   break;
     }  // end   until break
   oo__xmltostr(oo__xmlkey);
@@ -437,36 +450,15 @@ return true;
 
 static int oo__error= 0;  // error number which will be returned when
   // oo_main() terminates normal;
-typedef struct {
-  read_info_t* ri;  // file handle for input files
-  read_info_t* riph;  // file handle for input files;
-    // this is a copy of .ri because it may be necessary to reaccess
-    // a file which has already been logically closed;
-    // used by the procedures oo__rewind() and oo__closeall();
-  int format;  // input file format;
-    // ==-9: unknown; ==0: o5m; ==10: xml; ==-1: pbf;
-  str_info_t* str;  // string unit handle (if o5m format)
-  uint64_t tyid;  // type/id of last read osm object of this file
-  uint32_t hisver;  // OSM object version; needed for creating diff file
-  const char* filename;
-  bool endoffile;
-  int deleteobject;  // replacement for .osc <delete> tag
-    // 0: not to delete; 1: delete this object; 2: delete from now on;
-  int deleteobjectjump;  // same as before but as save value for jumps
-    // 0: not to delete; 1: delete this object; 2: delete from now on;
-  int64_t o5id;  // for o5m delta coding
-  int32_t o5lon,o5lat;  // for o5m delta coding
-  int64_t o5histime;  // for o5m delta coding
-  int64_t o5hiscset;  // for o5m delta coding
-  int64_t o5rid[3];  // for o5m delta coding
-  } oo__if_t;
-static oo__if_t oo__if[global_fileM];
-static oo__if_t* oo__ifp= oo__if;  // currently used element in oo__if[]
+
+
+oo__if_vt oo__if;
+static oo__if_vt::iterator oo__ifp= oo__if.begin();  // currently used element in oo__if[]
 #define oo__ifI (oo__ifp-oo__if)  // index
-static oo__if_t* oo__ife= oo__if;  // logical end of elements in oo__if[]
-static oo__if_t* oo__ifee= oo__if+global_fileM;
+static oo__if_vt::iterator oo__ife= oo__if.begin();  // logical end of elements in oo__if[]
+static oo__if_vt::iterator oo__ifee= oo__if.end();
   // physical end of oo_if[]
-static int oo_ifn= 0;  // number of currently open files
+//static int oo_ifn= 0;  // number of currently open files
 
 static bool oo__bbvalid= false;
   // the following bbox coordinates are valid;
@@ -477,7 +469,7 @@ static int64_t oo__timestamp= 0;
   // ==0: no file timestamp given;
 static bool oo__alreadyhavepbfobject= false;
 
-static void oo__findbb() {
+static void oo__findbb(Process * global, Read & read) {
   // find timestamp and border box in input file;
   // return:
   // oo__bbvalid: following border box information is valid;
@@ -487,7 +479,8 @@ static void oo__findbb() {
   byte* bufp,*bufe;
 
   read_input();
-  bufp= read_bufp; bufe= read_bufe;
+  bufp= (byte*)read.bufp(); 
+  bufe= (byte*)read.bufe();
   if(oo__ifp->format==0) {  // o5m
     byte b;  // latest byte which has been read
     int l;
@@ -510,7 +503,7 @@ return;
         bufp= bufe;
     continue;
         }  // timestamp
-      if(b==0xdb && oo__ifp==oo__if) {
+      if(b==0xdb && oo__ifp==oo__if.begin()) {
           // border box AND first input file
         bufp++;
         l= pbf_uint32(&bufp);
@@ -555,7 +548,7 @@ return;
 
         sp++;  // jump over '<'
         if(strzcmp(sp,"osmAugmentedDiff")==0)
-          global_mergeversions= true;
+          global->mergeversions= true;
         for(;;) {  // jump over "osm ", "osmChange ", "osmAugmentedDiff"
           c= *sp;
           if(oo__wsnul(c))
@@ -585,7 +578,7 @@ return;
         bufp++;
     continue;
         }  // "<osm"
-      else if(c1=='b' && c2=='o' && c3=='u'  && oo__ifp==oo__if) {
+      else if(c1=='b' && c2=='o' && c3=='u'  && oo__ifp==oo__if.begin()) {
           // bounds AND first input file
         // bounds may be supplied in one of these formats:
         // <bounds minlat="53.01104" minlon="8.481593"
@@ -664,20 +657,23 @@ return;
     }  // end   osm xml
   else if(oo__ifp->format==-1) {  // pbf
     //pb_input();
-    if(pb_type==8 && oo__ifp==oo__if) {
+    if(read.pbf.type == PBF::pbf_type && oo__ifp==oo__if.begin()) {
         // pbf header AND first input file
-      oo__bbx1= pb_bbx1; oo__bby1= pb_bby1;
-      oo__bbx2= pb_bbx2; oo__bby2= pb_bby2;
-      oo__bbvalid= pb_bbvalid;
-      if(pb_filetimestamp!=0)
-        oo__timestamp= pb_filetimestamp;
+      oo__bbx1= read.pbf.bbx1; 
+      oo__bby1= read.pbf.bby1;
+      oo__bbx2= read.pbf.bbx2; 
+      oo__bby2= read.pbf.bby2;
+
+      oo__bbvalid= read.pbf.bbvalid;
+      if(read.pbf.filetimestamp!=0)
+        oo__timestamp= read.pbf.filetimestamp;
       }  // end   pbf header
     else
       oo__alreadyhavepbfobject= true;
     }  // end   pbf
   }  // end   oo__findbb()
 
-static inline int oo__gettyid() {
+int oo__gettyid(Process & global, Read & read) {
   // get tyid of the next object in the currently processed input file;
   // tyid is a combination of object type and id: we take the id and
   // add UINT64_C(0x0800000000000000) for nodes,
@@ -704,14 +700,14 @@ static inline int oo__gettyid() {
     int l;
 
     o5id= oo__ifp->o5id;
-    p= read_bufp;
-    while(p<read_bufe) {
+    p= read.bufpb();
+    while(p<read.bufeb()) {
       b= *p++;
       if(b>=0x10 && b<=0x12) {  // osm object is starting here
         oo__ifp->tyid= idoffset[b];
-        pbf_intjump(&p);  // jump over length information
+        read.pbf.intjump(&p);  // jump over length information
         oo__ifp->tyid+= o5id+pbf_sint64(&p);
-        if(global_diff)
+        if(global.diff)
           oo__ifp->hisver= pbf_uint32(&p);
 return 0;
         }
@@ -750,7 +746,7 @@ return 1;
       if(s[0]=='i' && s[1]=='d' && s[2]=='=' &&
           (s[3]=='\"' || s[3]=='\'')) {  // found id
         oo__ifp->tyid= r+oo__strtosint64(s+4);
-        if(!global_diff)
+        if(!global.diff)
 return 0;
         oo__ifp->hisver= 0;
         for(;;) {
@@ -772,21 +768,21 @@ return 1;
     }
   else if(format==-1) {  // pbf
 #if 1  //,,,
-    while(pb_type>2) {  // not an OSM object
-      pb_input(false);
+    while(read.pbf.type> PBF::osm_type) {  // not an OSM object
+      read.pbf.input(false);
       oo__alreadyhavepbfobject= true;
       }
 #endif
-    if((pb_type & 3)!=pb_type)  // still not an osm object
+    if((read.pbf.type & PBF::osm_bit)!= read.pbf.type)  // still not an osm object
 return 1;
-    oo__ifp->tyid= idoffset[pb_type]+pb_id;
-    oo__ifp->hisver= pb_hisver;
+    oo__ifp->tyid= idoffset[read.pbf.type]+read.pbf.id;
+    oo__ifp->hisver= read.pbf.hisver;
 return 0;
     }
 return 2;  // (unknown format)
   }  // end   oo__gettyid()
 
-static inline int oo__getformat() {
+ int oo__getformat(Process & global, Read & read) {
   // determine the formats of all opened files of unknown format
   // and store these determined formats;
   // do some intitialization for the format, of necessary;
@@ -797,21 +793,20 @@ static inline int oo__getformat() {
   //            does not have multi-client capabilities;
   // oo__if[].format: input file format; ==0: o5m; ==10: xml; ==-1: pbf;
   static int pbffilen= 0;  // number of pbf input files;
-  oo__if_t* ifptemp;
+  oo__if_vt::iterator ifptemp= oo__ifp;
   byte* bufp;
   #define bufsp ((char*)bufp)  // for signed char
 
-  ifptemp= oo__ifp;
-  oo__ifp= oo__if;
+  oo__if_vt::iterator oo__ifp= oo__if.begin();
   while(oo__ifp<oo__ife) {  // for all input files
     if(oo__ifp->ri!=NULL && oo__ifp->format==-9) {
         // format not yet determined
-      read_switch(oo__ifp->ri);
-      if(read_bufp>=read_bufe) {  // file empty
+      read.read_switch(oo__ifp->ri);
+      if(read.bufp()>=read.bufe()) {  // file empty
         PERRv("file empty: %.80s",oo__ifp->filename)
 return 2;
         }
-      bufp= read_bufp;
+      bufp= read.bufpb();
       if(bufp[0]==0 && bufp[1]==0 && bufp[2]==0 &&
           bufp[3]>8 && bufp[3]<20) {  // presumably .pbf format
         if(++pbffilen>1) {   // pbf
@@ -819,8 +814,8 @@ return 2;
 return 5;
           }
         oo__ifp->format= -1;
-        pb_ini();
-        pb_input(false);
+        read.pbf.ini();
+        read.pbf.input(false);
         oo__alreadyhavepbfobject= true;
         }
       else if(strzcmp(bufsp,"<?xml")==0 ||
@@ -838,7 +833,7 @@ return 5;
       else if((bufp[0]==0xff && bufp[1]>=0x10 && bufp[1]<=0x12) ||
           (bufp[0]==0xff && bufp[1]==0xff &&
           bufp[2]>=0x10 && bufp[2]<=0x12) ||
-          (bufp[0]==0xff && read_bufe==read_bufp+1)) {
+	      (bufp[0]==0xff && read.bufe()==read.bufp()+1)) {
           // presumably shortened .o5m format
         if(loglevel>=2)
           fprintf(stderr,"osmconvert: Not a standard .o5m file header "
@@ -851,10 +846,10 @@ return 5;
         PERRv("unknown file format: %.80s",oo__ifp->filename)
 return 3;
         }
-      oo__findbb();
+      oo__findbb(&global,read);
       oo__ifp->tyid= 0;
       oo__ifp->hisver= 0;
-      oo__gettyid();
+      oo__gettyid(global,read);
         // initialize tyid of the currently used input file
       }  // format not yet determined
     oo__ifp++;
@@ -866,24 +861,24 @@ return 3;
     write_createtimestamp(oo__timestamp,s);
     fprintf(stderr,"osmconvert: File timestamp: %s\n",s);
     }
-  if(global_timestamp!=0)  // user wants a new file timestamp
-    oo__timestamp= global_timestamp;
+  if(global.timestamp!=0)  // user wants a new file timestamp
+    oo__timestamp= global.timestamp;
   return 0;
   #undef bufsp
   }  // end oo__getformat()
 
 static uint64_t oo__tyidold= 0;  // tyid of the last written object;
 
-static inline void oo__switch() {
+ void oo__switch(Process & global, Read & read) {
   // determine the input file with the lowest tyid
   // and switch to it
-  oo__if_t* ifp,*ifpmin;
+   oo__if_vt::iterator ifp,ifpmin;
   uint64_t tyidmin,tyidold,tyid;
 
   // update tyid of the currently used input file and check sequence
-  if(oo__ifp!=NULL) {  // handle of current input file is valid
+  if(oo__ifp!=oo__if.begin()) {  // handle of current input file is valid
     tyidold= oo__ifp->tyid;
-    if(oo__gettyid()==0) {  // new tyid is valid
+    if(oo__gettyid(global, read)==0) {  // new tyid is valid
 //DPv(got   %llx %s,oo__ifp->tyid,oo__ifp->filename)
       if(oo__ifp->tyid<tyidold) {  // wrong sequence
         int64_t id; int ty;
@@ -893,11 +888,11 @@ static inline void oo__switch() {
         id= ((int64_t)(tyidold & UINT64_C(0xfffffffffffffff)))-
           INT64_C(0x800000000000000);
         WARNv("wrong order at %s %Ld in file %s",
-          ONAME(ty),id,oo__ifp->filename)
+	      ONAME(ty),id,oo__ifp->filename);
         ty= oo__ifp->tyid>>60;
         id= ((int64_t)(oo__ifp->tyid & UINT64_C(0xfffffffffffffff)))-
           INT64_C(0x800000000000000);
-        WARNv("next object is %s %Ld",ONAME(ty),id)
+        WARNv("next object is %s %Ld",ONAME(ty),id);
         }  // wrong sequence
       }  // new tyid is valid
     }  // end   handle of current input file is valid
@@ -908,7 +903,7 @@ static inline void oo__switch() {
     // default; therefore we do not switch in cases we do not
     // find a minimum
   ifp= oo__ife;
-  while(ifp>oo__if) {
+  while(ifp != oo__if.begin()) {
     ifp--;
     if(ifp->ri!=NULL) {  // file handle is valid
 //DPv(have  %llx %s,ifp->tyid,ifp->filename)
@@ -930,13 +925,13 @@ static inline void oo__switch() {
 //DPv(chose %llx %s,oo__ifp->tyid,oo__ifp->filename)
   }  // end oo__switch()
 
-static int oo_sequencetype= -1;
+//static int oo_sequencetype= -1;
   // type of last object which has been processed;
   // -1: no object yet; 0: node; 1: way; 2: relation;
-static int64_t oo_sequenceid= INT64_C(-0x7fffffffffffffff);
+//static int64_t oo_sequenceid= INT64_C(-0x7fffffffffffffff);
   // id of last object which has been processed;
 
-static void oo__reset(oo__if_t* ifp) {
+void oo__reset(oo__if_vt::iterator ifp) {
   // perform a reset of output procedures and variables;
   // this is mandatory if reading .o5m or .pbf and jumping
   // within the input file;
@@ -950,20 +945,21 @@ static void oo__reset(oo__if_t* ifp) {
     pb_input(true);
   }  // oo__reset()
 
-static int oo__rewindall() {
+static int oo__rewindall(Process & global, Read & read) {
   // rewind all input files;
   // return: 0: ok; !=0: error;
-  oo__if_t* ifp,*ifp_sav;
+  oo__if_vt::iterator ifp,ifp_sav;
 
   ifp_sav= oo__ifp;  // save original info pointer
-  ifp= oo__if;
+  ifp= oo__if.begin();
   while(ifp<oo__ife) {
     if(ifp->riph!=NULL) {
       if(ifp->ri==NULL && ifp->riph!=NULL) {
           // file has been logically closed
         // logically reopen it
         ifp->ri= ifp->riph;
-        oo_ifn++;
+        //oo_ifn++;
+	ifp++;
         }
       read_switch(ifp->ri);
       if(read_rewind())
@@ -976,33 +972,33 @@ return 1;
     ifp++;
     }
   oo__ifp= ifp_sav;  // restore original info pointer
-  if(oo__ifp!=NULL && oo__ifp->ri!=NULL) {
+  if(oo__ifp != oo__if.begin() && oo__ifp->ri!=NULL) {
     read_switch(oo__ifp->ri);
     str_switch(oo__ifp->str);
     }
   else
-    oo__switch();
+    oo__switch(global,read);
   oo__tyidold= 0;
-  oo_sequencetype= -1;
-  oo_sequenceid= INT64_C(-0x7fffffffffffffff);
+  oo_sequencetype( -1);
+  oo_sequenceid(INT64_C(-0x7fffffffffffffff));
   return 0;
   }  // end oo__rewindall()
 
-static int oo__jumpall() {
+static int oo__jumpall(Process & global, Read & read) {
   // jump in all input files to the previously stored position;
   // return: 0: ok; !=0: error;
-  oo__if_t* ifp,*ifp_sav;
+  std::vector<oo__if_t>::iterator ifp;
   int r;
 
-  ifp_sav= oo__ifp;  // save original info pointer
-  ifp= oo__if;
+ std::vector<oo__if_t>::iterator  ifp_sav= oo__ifp;  // save original info pointer
+ ifp= oo__if.begin();
   while(ifp<oo__ife) {  // for all files
     if(ifp->riph!=NULL) {  // file is still physically open
       if(ifp->ri==NULL && ifp->riph!=NULL) {
           // file has been logically closed
         // logically reopen it
         ifp->ri= ifp->riph;
-        oo_ifn++;
+        ifp++;
         }
       read_switch(ifp->ri);
       r= read_jump();
@@ -1018,24 +1014,26 @@ return 1;
     ifp++;
     }  // for all files
   oo__ifp= ifp_sav;  // restore original info pointer
-  if(oo__ifp!=NULL && oo__ifp->ri!=NULL) {
+  if(
+     (oo__ifp != oo__if.begin())  && 
+     oo__ifp->ri!=NULL) {
     read_switch(oo__ifp->ri);
     str_switch(oo__ifp->str);
     }
   else {
-    oo__switch();
-    if(oo__ifp==NULL) {  // no file chosen
-      oo_ifn= 0;
-      ifp= oo__if;
-      while(ifp<oo__ife) {  // for all files
-        ifp->ri= NULL;  // mark file as able to be logically reopened
-        ifp++;
+    oo__switch(global,read);
+    if(oo__ifp==oo__if.begin()) {  // no file chosen
+      //      oo_ifn= 0;
+      //ifp= oo__if;
+      while(oo__ifp != oo__ife) {  // for all files
+        oo__ifp->ri= NULL;  // mark file as able to be logically reopened
+        oo__ifp++;
         }
       }
     }
   oo__tyidold= 0;
-  oo_sequencetype= -1;
-  oo_sequenceid= INT64_C(-0x7fffffffffffffff);
+  oo_sequencetype(-1);
+  oo_sequenceid(INT64_C(-0x7fffffffffffffff));
   return 0;
   }  // end oo__jumpall()
 
@@ -1246,7 +1244,7 @@ int dependencystage;
 static void oo__dependencystage(int ds) {
   // change the dependencystage;
   if(loglevel>=2)
-    PINFOv("changing dependencystage from %i to %i.",dependencystage,ds)
+    PINFOv2("changing dependencystage from %i to %i.",dependencystage,ds)
   dependencystage= ds;
   }  // oo__dependencystage()
 
@@ -1446,7 +1444,7 @@ return 0;  // nothing else to do here
       }  // at least one input file open
 
     // care about end of input file
-    if(oo_ifn==0 || (read_bufp>=read_bufe && oo__ifp->format>=0) ||
+    if(oo_ifn==0 || (read_bufp>=read.bufe() && oo__ifp->format>=0) ||
         (oo__ifp->format==-1 && pb_type<0)) {  // at end of input file
       if(oo_ifn>0) {
         if(oo__ifp->format==-1 && pb_type<0) {
@@ -1638,7 +1636,7 @@ return 23;
     else {  // xml
       while(c!=0 && c!='<') c= (char)*++bufp;
       if(c==0) {
-        read_bufp= read_bufe;
+        read_bufp= read.bufe();
   continue;
         }
       c= bufsp[1];
@@ -2037,9 +2035,9 @@ return 23;
 
     // care about possible array overflows
     if(refide>=refidee)
-      PERRv("%s %Ld has too many refs.",ONAME(otype),id)
+      PERRv2("%s %Ld has too many refs.",ONAME(otype),id)
     if(keye>=keyee)
-      PERRv("%s %Ld has too many key/val pairs.",
+      PERRv2("%s %Ld has too many key/val pairs.",
         ONAME(otype),id)
 
     // care about diffs and sequence

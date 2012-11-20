@@ -7,7 +7,7 @@ CXXFLAGS= -save-temps -std=c++0x
 #CFLAGS= -save-temps -std=c++0x
 
 osmconvert.o : osmconvert.cpp
-util.o : util.cpp
+util.o : util.cpp util.h
 global.o : global.cpp
 
 osmconvert : osmconvert.o util.o global.o process.o oo.o

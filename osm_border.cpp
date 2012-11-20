@@ -13,7 +13,7 @@
 // the sections of private and public definitions are separated
 // by a horizontal line: ----
 
-static const int32_t border__nil= 2000000000L;
+
 static int32_t border__bx1= 2000000000L,border__by1,
   border__bx2,border__by2;
   // in case of a border box:
