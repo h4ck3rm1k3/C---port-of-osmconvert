@@ -122,3 +122,4 @@ bool write_testmode();
 
 // for testing
 char* uint32toa(uint32_t v,char* s);
+char* int64toa(int64_t v,char* s);
