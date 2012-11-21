@@ -1,0 +1,12 @@
+ #include <cppunit/extensions/HelperMacros.h>
+
+class MyTest : public CppUnit::TestFixture {
+  CPPUNIT_TEST_SUITE( MyTest );
+  CPPUNIT_TEST( testVector);
+  CPPUNIT_TEST_SUITE_END();
+public:
+  int testVector()
+  {
+    return 1;
+  }
+};

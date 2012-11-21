@@ -410,6 +410,23 @@ const char* helptext=
 #include <string>
 using namespace std;
 
+#include "stdinc.hpp"
+#include "obj_relref.hpp"
+#include "osm_hash.hpp"
+#include "osm_border.h"
+#include "oo.h"
+#include "read.hpp"
+#include "str.hpp"
+#include <vector>
+#include "process.hpp"
+#include "util.h"
+#include "process.hpp"
+#include "read.hpp"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
+
 #define _FILE_OFFSET_BITS 64
 #include <zlib.h>
 #include <inttypes.h>
@@ -424,7 +441,7 @@ using namespace std;
 #include <signal.h>
 
 //typedef enum {false= 0,true= 1} bool;
-static int loglevel= 0;  // logging to stderr;
+//int loglevel= 0;  // logging to stderr;
   // 0: no logging; 1: small logging; 2: normal logging;
   // 3: extended logging;
 #define DP(f) fprintf(stderr,"Debug: " #f "\n");
@@ -1035,8 +1052,6 @@ void sigcatcher(int sig) {
   }  // end   sigchatcher()
 #endif
 
-#include "process.hpp"
-#include "read.hpp"
 
 int main(int argc,char** argv) {
   Process aProcess;
@@ -1473,7 +1488,7 @@ return 2;
     uint32_t zlibflags;
     zlibflags= zlibCompileFlags();
     if(loglevel>=2) {
-      PINFOv("zlib " ZLIB_VERSION " flags: %08x",zlibflags)
+      PINFOv("zlib " ZLIB_VERSION " flags: %08x",zlibflags);
       }
     //if((zlibflags&0xc0) <= 0x40)
       //WARN("you are using the 32 bit zlib. Hence file size max. 2 GB.")

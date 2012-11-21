@@ -1,3 +1,5 @@
+#ifndef INC_READ_HPP
+#define INC_READ_HPP
 //class read_info_t;
 #include "oo.h"
 
@@ -48,6 +50,9 @@ public:
   Format format;
   PBF pbf;
 
+  bool setjump();
 
   void read_switch(read_info_t* filehandle);
 };
+
+#endif

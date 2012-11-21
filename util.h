@@ -1,4 +1,5 @@
 //#include "stdinc.hpp"
+#include <vector>
 int strzcmp(const char* s1,const char* s2);
 int strycmp(const char* s1,const char* s2);
 bool file_exists(const char* file_name);
@@ -7,6 +8,10 @@ int strzlcmp(const char* s1,const char* s2);
 
 void PERRv1(const char * format,const char *str);
 void WARNv(const char * format,const char *str);
+typedef uint8_t byte;
+typedef unsigned int uint;
+void WARNv(const char * format,byte *str);
+void WARNv(const char * format,byte &str);
 void WARNv(const char * format,int64_t & i,const char *str2);
 void WARNv(const char * format,const char *, int64_t & i,const char *str2);
 void WARNv(const char * format,const char *, int64_t & i);
@@ -20,9 +25,10 @@ void WARNv(const char * format,const char *, int64_t & i);
 void PERR1(const char * msg);
 void PINFO(const char * msg);
 //void PINFOv(const char * fmt, const char * args);
-void PINFOv2(const char * fmt, unsigned int arg);
+void PINFOv(const char * fmt, unsigned int arg);
+void PINFOv(const char * fmt, unsigned int arg,unsigned int arg2);
 
-#define PINFOv(A, B)  PINFOv2(A, B);
+//#define PINFOv(A, B)  PINFOv2(A, B);
 
 #define PERR(A)  PERR1(A);
 
@@ -77,9 +83,38 @@ int read_rewind();
 void str_switch(str_info_t* ri);
 void str_reset();
 void pb_input(bool v);
-#include <vector>
+
 typedef std::vector<oo__if_t> oo__if_vt;
 
 void oo__reset(oo__if_vt::iterator ifp);
 
 int read_jump();
+void read_close();
+
+bool read_open(const char * filename);
+//read_info_t* read_infop;
+bool cwn_ini(const char * fname);
+bool cww_ini(const char * fname);
+
+char *stpmcpy(char *dest, const char *src, size_t maxlen);
+void write_timestamp(uint64_t v);
+void write_str(const char *);
+//const char *  NL= "\n";
+void cww_processing_set();
+void cwn_processing();
+
+void wo_flush();
+void wo_reset();
+void wo_end();
+void wo_format(int wformat);
+bool write_newfile(const char * name);
+typedef std::vector<int64_t> refid_t;  // ids of referenced object
+typedef std::vector<byte> reftype_t;  // ids of referenced object
+typedef std::vector<int32_t> coord_t;  // ids of referenced object
+typedef std::vector<coord_t> coord2_t;  // ids of referenced object
+typedef std::vector<char> charv_t;  // ids of referenced object
+typedef std::vector<charv_t> charv2_t;  // ids of referenced object
+
+void posr_processing(int * maxrewind_posr,coord2_t & refxy);
+
+bool write_testmode();

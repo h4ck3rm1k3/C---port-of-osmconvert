@@ -1,4 +1,5 @@
-
+#ifndef INC_PROCESS_HPP
+#define INC_PROCESS_HPP
 
 // commands
 class Process {
@@ -47,3 +48,5 @@ public:
   bool write_testmode;
   int oo_ifn;
 };
+
+#endif
