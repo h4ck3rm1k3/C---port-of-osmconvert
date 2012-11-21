@@ -38,7 +38,8 @@ char* strMcpy(const char* d,const char* s ) ;
 time_t oo__strtimetosint64(const char *);
 //long long int oo__strtosint64(const char *);
 int64 oo__strtosint64(const char *);
-char * strmcpy(const char *, const char * ,size_t size);
+
+char * strmcpy(char *dest, const char *src, size_t maxlen);
 
 bool border_box(const char *);
 bool border_file(const char *);
@@ -118,3 +119,6 @@ typedef std::vector<charv_t> charv2_t;  // ids of referenced object
 void posr_processing(int * maxrewind_posr,coord2_t & refxy);
 
 bool write_testmode();
+
+// for testing
+char* uint32toa(uint32_t v,char* s);

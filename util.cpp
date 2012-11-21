@@ -23,7 +23,7 @@ char* uint32toa(uint32_t v,char* s) {
   return s;
   }  // end   uint32toa()
 
-static inline char* int64toa(int64_t v,char* s) {
+char* int64toa(int64_t v,char* s) {
   // convert int64_t integer into string;
   // v: long integer value to convert;
   // return: s;
@@ -54,9 +54,6 @@ char *stpcpy0(char *dest, const char *src) {
   return dest;
   }  // end stpcpy0()
 
-char* strMcpy(const char* d,const char* s ) {
-  return strmcpy((d),(s),sizeof(d));
-}
 
 char *strmcpy(char *dest, const char *src, size_t maxlen) {
   // similar to strcpy(), this procedure copies a character string;
@@ -164,3 +161,6 @@ bool file_exists(const char* file_name) {
 
 
 
+char* strMcpy(char* d,const char* s ) {
+  return strmcpy((d),(s),sizeof(d));
+}
