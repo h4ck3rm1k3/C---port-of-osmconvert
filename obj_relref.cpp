@@ -47,7 +47,7 @@ static void rr__end() {
 static int rr_ini(const char* filename) {
   // open a temporary file with the given name for random r/w access;
   // return: ==0: ok; !=0: error;
-  strcpy(stpmcpy(rr__filename,filename,sizeof(rr__filename)-2),".0");
+  strcpy(stpncpy(rr__filename,filename,sizeof(rr__filename)-2),".0");
   if(rr__fd>=0)  // file already open
 return 0;  // ignore this call
   unlink(rr__filename);

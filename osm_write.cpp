@@ -483,13 +483,13 @@ static inline void write_createsbbox(int32_t x_min, int32_t y_min,
   write_createsfix7o(y_min, y_minS);
   write_createsfix7o(x_max, x_maxS);
   write_createsfix7o(y_max, y_maxS);
-  s = stpcpy0(s, x_minS);
-  s = stpcpy0(s, ",");
-  s = stpcpy0(s, y_minS);
-  s = stpcpy0(s, ",");
-  s = stpcpy0(s, x_maxS);
-  s = stpcpy0(s, ",");
-  s = stpcpy0(s, y_maxS);
+  s = strcpy(s, x_minS);
+  s = strcpy(s, ",");
+  s = strcpy(s, y_minS);
+  s = strcpy(s, ",");
+  s = strcpy(s, x_maxS);
+  s = strcpy(s, ",");
+  s = strcpy(s, y_maxS);
   } // end write_createsbbox()
 
 static inline void write_sfix7(int32_t v) {

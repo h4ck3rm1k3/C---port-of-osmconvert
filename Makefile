@@ -7,7 +7,7 @@ osmconvert.o : osmconvert.cpp
 util.o : util.cpp util.h
 global.o : global.cpp
 
-osmconvert : osmconvert.o util.o global.o process.o oo.o
+osmconvert : osmconvert.o util.o global.o process.o oo.o oo2.o
 
 a.osm : osmconvert a.pbf
 	./osmconvert --drop-history a.pbf >a.osm

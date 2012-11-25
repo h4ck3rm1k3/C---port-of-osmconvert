@@ -119,7 +119,7 @@ return pw__objp;
     }  // not the first hierarchy object
   pw__objp= pw__obje++;
   // write PBF object's header and pointers
-  pw__objp->bufl= (byte*)stpmcpy((char*)pw__objp->buf,header,20);
+  pw__objp->bufl= (byte*)stpncpy((char*)pw__objp->buf,header,20);
   pw__objp->headerlen= (int)(pw__objp->bufl-pw__objp->buf);
   pw__objp->bufc= pw__objp->bufl+10;
   pw__objp->bufe= pw__objp->bufc;
@@ -682,7 +682,7 @@ static void pw_header(bool bboxvalid,
   if(timestamp!=0) {  // file timestamp given
     char s[40],*sp;
 
-    sp= stpcpy0(s,"timestamp=");
+    sp= strcpy(s,"timestamp=");
     write_createtimestamp(timestamp,sp);
     pw__obj_add_id(0x2a);  // S 5 'optional_features'
     pw__obj_add_str(s);

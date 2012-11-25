@@ -45,14 +45,6 @@ char* int64toa(int64_t v,char* s) {
   return s;
   }  // end   int64toa()
 
-char *stpcpy0(char *dest, const char *src) {
-  // redefinition of C99's stpcpy() because it's missing in MinGW,
-  // and declaration in Linux seems to be wrong;
-  while(*src!=0)
-    *dest++= *src++;
-  *dest= 0;
-  return dest;
-  }  // end stpcpy0()
 
 
 char *strmcpy(char *dest, const char *src, size_t maxlen) {
@@ -77,41 +69,25 @@ return dest;
   }  // end   strmcpy()
 //#define strMcpy(d,s) strmcpy((d),(s),sizeof(d))
 
- char *stpmcpy(char *dest, const char *src, size_t maxlen) {
-  // similar to strmcpy(), this procedure copies a character string;
-  // however, it returns the address of the destination string's
-  // terminating zero character;
-  // this makes it easier to concatenate strings;
-  char* d;
 
-  if(maxlen==0)
-return dest;
-  d= dest;
-  while(--maxlen>0 && *src!=0)
-    *d++= *src++;
-  *d= 0;
-  return d;
-  }  // end stpmcpy()
-#define stpMcpy(d,s) stpmcpy(d,s,sizeof(d))
-
- int strzcmp(const char* s1,const char* s2) {
-  // similar to strcmp(), this procedure compares two character strings;
-  // here, the number of characters which are to be compared is limited
-  // to the length of the second string;
-  // i.e., this procedure can be used to identify a short string s2
-  // within a long string s1;
-  // s1[]: first string;
-  // s2[]: string to compare with the first string;
-  // return:
-  // 0: both strings are identical; the first string may be longer than
-  //    the second;
-  // -1: the first string is alphabetical smaller than the second;
-  // 1: the first string is alphabetical greater than the second;
-  while(*s1==*s2 && *s1!=0) { s1++; s2++; }
-  if(*s2==0)
-    return 0;
-  return *(unsigned char*)s1 < *(unsigned char*)s2? -1: 1;
-  }  // end   strzcmp()
+ // int strzcmp(const char* s1,const char* s2) {
+ //  // similar to strcmp(), this procedure compares two character strings;
+ //  // here, the number of characters which are to be compared is limited
+ //  // to the length of the second string;
+ //  // i.e., this procedure can be used to identify a short string s2
+ //  // within a long string s1;
+ //  // s1[]: first string;
+ //  // s2[]: string to compare with the first string;
+ //  // return:
+ //  // 0: both strings are identical; the first string may be longer than
+ //  //    the second;
+ //  // -1: the first string is alphabetical smaller than the second;
+ //  // 1: the first string is alphabetical greater than the second;
+ //  while(*s1==*s2 && *s1!=0) { s1++; s2++; }
+ //  if(*s2==0)
+ //    return 0;
+ //  return *(unsigned char*)s1 < *(unsigned char*)s2? -1: 1;
+ //  }  // end   strzcmp()
 
  int strzlcmp(const char* s1,const char* s2) {
   // similar to strzcmp(), this procedure compares two character strings;

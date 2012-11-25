@@ -48,7 +48,7 @@ static void cwn__end() {
 static int cwn_ini(const char* filename) {
   // open a temporary file with the given name for random r/w access;
   // return: ==0: ok; !=0: error;
-  strcpy(stpmcpy(cwn__filename,filename,sizeof(cwn__filename)-2),".3");
+  strcpy(stpncpy(cwn__filename,filename,sizeof(cwn__filename)-2),".3");
   if(cwn__fd>=0)  // file already open
 return 0;  // ignore this call
   unlink(cwn__filename);

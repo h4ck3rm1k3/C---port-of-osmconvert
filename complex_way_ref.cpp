@@ -49,7 +49,7 @@ static void cww__end() {
 static int cww_ini(const char* filename) {
   // open a temporary file with the given name for random r/w access;
   // return: ==0: ok; !=0: error;
-  strcpy(stpmcpy(cww__filename,filename,sizeof(cww__filename)-2),".5");
+  strcpy(stpncpy(cww__filename,filename,sizeof(cww__filename)-2),".5");
   if(cww__fd>=0)  // file already open
 return 0;  // ignore this call
   unlink(cww__filename);

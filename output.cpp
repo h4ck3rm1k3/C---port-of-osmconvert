@@ -619,7 +619,7 @@ static inline void wo_ref(int64_t refid,int reftype,
 
     o5_svar64(refid-o5_ref[reftype]); o5_ref[reftype]= refid;
     o5typerole[0]= reftype+'0';
-    strmcpy(o5typerole+1,refrole,sizeof(o5typerole)-1);
+    strncpy(o5typerole+1,refrole,sizeof(o5typerole)-1);
     stw_write(o5typerole,NULL);
     o5_markref(1);
 return;

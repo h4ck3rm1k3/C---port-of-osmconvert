@@ -1,5 +1,6 @@
 #ifndef INC_OO_H
 #define INC_OO_H
+#include <vector>
 #define str__tabM (15000+4000)
   // +4000 because it might happen that an object has a lot of
   // key/val pairs or refroles which are not stored already;
@@ -61,15 +62,90 @@ typedef struct {
   uint32_t hisver;  // OSM object version; needed for creating diff file
   const char* filename;
   bool endoffile;
-  int deleteobject;  // replacement for .osc <delete> tag
+  int deleteobject();  // replacement for .osc <delete> tag
+  int deleteobject(int x);  // replacement for .osc <delete> tag
     // 0: not to delete; 1: delete this object; 2: delete from now on;
-  int deleteobjectjump;  // same as before but as save value for jumps
+  int deleteobjectjump();  // same as before but as save value for jumps
+  int deleteobjectjump(int);  // same as before but as save value for jumps
     // 0: not to delete; 1: delete this object; 2: delete from now on;
   int64_t o5id;  // for o5m delta coding
   int32_t o5lon,o5lat;  // for o5m delta coding
   int64_t o5histime;  // for o5m delta coding
   int64_t o5hiscset;  // for o5m delta coding
-  int64_t o5rid[3];  // for o5m delta coding
+
+  int64_t _o5rid[3];  // for o5m delta coding
+  int64_t o5ridadd(int64_t o); // o5rid[0]
+  int64_t o5ridadd(char index, int64_t o); // o5rid[index]
+
   } oo__if_t;
+
+typedef std::vector<oo__if_t> oo__if_vt;
+
+
+// static int oo__error= 0;  // error number which will be returned when
+//   // oo_main() terminates normal;
+// 
+// static oo__if_vt::iterator oo__ifp= oo__if.begin();  // currently used element in oo__if[]
+// #define oo__ifI (oo__ifp-oo__if)  // index
+// static oo__if_vt::iterator oo__ife= oo__if.begin();  // logical end of elements in oo__if[]
+// static oo__if_vt::iterator oo__ifee= oo__if.end();
+
+
+
+class OO {
+public :
+  static void end();
+  bool bbvalid= false;
+  int error;
+  int dependencystage();
+  int dependencystage(int);
+  const int maxrewindINI =12;
+  const int keyvalM =8000;
+  oo__if_vt::iterator ifp;
+  oo__if_vt::iterator ife;
+  oo__if_vt::iterator ifee;
+  oo__if_vt inf;
+
+  int getformat();
+  int  gettyid();
+  void rrprocessing(int * x);
+  uint64_t  tyidold();
+  uint64_t  tyidold(int x);
+  void reset_ifp();
+  bool ws(int x);
+  bool rewindall();
+  void _switch();
+  void close();
+  bool jumpall();
+  //  oo__if_vt::iterator oo.ifp
+  int64_t timestamp;
+
+  int32_t bbx1, bby1, bbx2, bby2;
+  bool alreadyhavepbfobject;
+  uint32_t strtouint32(const char* s);
+  int64_t strtimetosint64(const char *);
+  int xmlheadtag;
+  int xmltag();
+  char  xmlkey(int c);
+  const char * xmlvals();
+  char xmlval(int c);
+  int strtodeg(const char *);
+  int strtosint64(const char * );
+
+  bool ifp_ne_inf();
+    //TODO if(oo.ifp!=oo.inf && oo.ifp->tyid==oo.inf->tyid) {
+
+  bool ifp_not_first();
+  // TODO if(oo.ifp> oo.inf.begin())
+
+  int sequenceid();
+  int sequencetype();
+
+  int sequenceid(int);
+  int sequencetype(int);
+
+};
+
+
 
 #endif

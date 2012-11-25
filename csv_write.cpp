@@ -85,7 +85,7 @@ return 1;
       len++;
       if(len>csv__keyMM) len= csv__keyMM;  // limit key length
       tp= &csv__key[csv__keyn*csv__keyMM];
-      strmcpy(tp,columns,len);
+      strncpy(tp,columns,len);
       csv__keyn++;
       if(strcmp(tp,"@otype")==0) csv_key_otype= true;
       else if(strcmp(tp,"@oname")==0) csv_key_oname= true;
@@ -122,7 +122,7 @@ static void csv_add(const char* key,const char* val) {
   kp= csv__key;
   while(keyn>0) {  // for all keys in column list
     if(strcmp(key,kp)==0) {  // key is in column list
-      strmcpy(csv__val+(kp-csv__key),val,csv__keyMM);
+      strncpy(csv__val+(kp-csv__key),val,csv__keyMM);
         // store value
       csv__valn++;
   break;

@@ -122,7 +122,7 @@ static void str_read(byte** pp,char** s1p,char** s2p) {
     if(s2p==NULL) {  // single string
       if(!donotstore && len1<=str__tabstrM) {
           // single string short enough for string table
-        stpcpy0(str__infop->tab[str__infop->tabi],*s1p)[1]= 0;
+        strcpy(str__infop->tab[str__infop->tabi],*s1p)[1]= 0;
           // add a second terminator, just in case someone will try
           // to read this single string as a string pair later;
         if(++str__infop->tabi>=str__tabM) str__infop->tabi= 0;

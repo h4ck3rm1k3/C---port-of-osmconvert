@@ -88,44 +88,8 @@ return timegm(&tm);
     }  // regular timestamp
   }  // end   pb__strtimetosint64()
 
-// for string primitive group table
-#define pb__strM (4*1024*1024)
-  // maximum number of strings within each block
-static char* pb__str[pb__strM];  // string table
-static char** pb__stre= pb__str;  // end of data in str[]
-static char** pb__stree= pb__str+pb__strM;  // end of str[]
-static int pb__strm= 0;
-// for tags of densnodes (start and end address)
-static byte* pb__nodetags= NULL,*pb__nodetagse= NULL;  // node tag pairs
-// for noderefs and tags of ways (start and end address each)
-static byte* pb__waynode= NULL,*pb__waynodee= NULL;
-static byte* pb__waykey= NULL,*pb__waykeye= NULL;
-static byte* pb__wayval= NULL,*pb__wayvale= NULL;
-// for refs and tags of relations (start and end address each)
-static byte* pb__relrefrole= NULL,*pb__relrefrolee= NULL;
-static byte* pb__relrefid= NULL,*pb__relrefide= NULL;
-static byte* pb__relreftype= NULL,*pb__relreftypee= NULL;
-static byte* pb__relkey= NULL,*pb__relkeye= NULL;
-static byte* pb__relval= NULL,*pb__relvale= NULL;
 
 //------------------------------------------------------------
-
-static bool pb_bbvalid= false;
-  // the following bbox coordinates are valid;
-static int32_t pb_bbx1,pb_bby1,pb_bbx2,pb_bby2;
-  // bbox coordinates (base 10^-7);
-static uint64_t pb_filetimestamp= 0;
-static int pb_type= -9;  // type of the object which has been read;
-  // 0: node; 1: way; 2: relation; 8: header;
-  // -1: end of file; <= -10: error;
-static int64_t pb_id= 0;  // id of read object
-static int32_t pb_lon= 0,pb_lat= 0;  // coordinates of read node
-static int32_t pb_hisver= 0;
-static int64_t pb_histime= 0;
-static int64_t pb_hiscset= 0;
-static uint32_t pb_hisuid= 0;
-static char* pb_hisuser= "";
-static int32_t pb_hisvis= -1;  // (default for 'unknown')
 
 static void pb_ini() {
   // initialize this module;

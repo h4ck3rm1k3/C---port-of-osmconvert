@@ -180,13 +180,13 @@ return;
     char* sp;
     int i;
 
-    sp= stpcpy0(stw__tab[stw__tabi],s1)+1;
+    sp= strcpy(stw__tab[stw__tabi],s1)+1;
       // write first string into string table
     if(s2==NULL)  // single string
       *sp= 0;  // second string must be written as empty string
         // into string table
     else
-      stpcpy0(sp,s2);  // write second string into string table
+      strcpy(sp,s2);  // write second string into string table
     i= stw__hashtab[h];
     if(i<0)  // no reference in hash table until now
       stw__tabprev[stw__tabi]= stw__tabnext[stw__tabi]= stw__tabi;

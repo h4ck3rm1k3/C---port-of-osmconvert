@@ -1,13 +1,19 @@
+#ifndef INC_UTIL_HPP
+#define INC_UTIL_HPP
 //#include "stdinc.hpp"
-#include <vector>
-int strzcmp(const char* s1,const char* s2);
+
+//int strzcmp(const char* s1,const char* s2);
 int strycmp(const char* s1,const char* s2);
 bool file_exists(const char* file_name);
 char *stpcpy0(char *dest, const char *src);
 int strzlcmp(const char* s1,const char* s2);
 
 void PERRv1(const char * format,const char *str);
+void PERRv1(const char * format,const char *str,int xo);
 void WARNv(const char * format,const char *str);
+void WARNv(const char * format,const char *str, int64_t & );
+void WARNv(const char *, int64_t&);
+void WARNv(const char * format,const char *str, int x);
 typedef uint8_t byte;
 typedef unsigned int uint;
 void WARNv(const char * format,byte *str);
@@ -85,7 +91,6 @@ void str_switch(str_info_t* ri);
 void str_reset();
 void pb_input(bool v);
 
-typedef std::vector<oo__if_t> oo__if_vt;
 
 void oo__reset(oo__if_vt::iterator ifp);
 
@@ -109,17 +114,23 @@ void wo_reset();
 void wo_end();
 void wo_format(int wformat);
 bool write_newfile(const char * name);
-typedef std::vector<int64_t> refid_t;  // ids of referenced object
-typedef std::vector<byte> reftype_t;  // ids of referenced object
-typedef std::vector<int32_t> coord_t;  // ids of referenced object
-typedef std::vector<coord_t> coord2_t;  // ids of referenced object
-typedef std::vector<char> charv_t;  // ids of referenced object
-typedef std::vector<charv_t> charv2_t;  // ids of referenced object
 
-void posr_processing(int * maxrewind_posr,coord2_t & refxy);
+
+
 
 bool write_testmode();
 
 // for testing
 char* uint32toa(uint32_t v,char* s);
 char* int64toa(int64_t v,char* s);
+int strzcmp(const char *a ,const char *b){
+  return strncmp(a, b, strlen(b));
+}
+// output.hpp
+void wo_start(int format,bool bboxvalid, int32_t x1,int32_t y1,int32_t x2,int32_t y2,int64_t timestamp);
+
+
+
+
+
+#endif

@@ -972,7 +972,7 @@ return true;
     if(file_type_o5m) strcpy(s,".o5m");
     if(file_type_o5c) strcpy(s,".o5c");
     if(file_type_pbf) strcpy(s,".pbf");
-    sp= stpcpy0(output_file,"-o=");
+    sp= stpcpy(output_file,"-o=");
     strcpy(sp,input_file);
     sp= strrchr(sp,'.');
     if(sp==NULL) sp= strchr(output_file,0);
@@ -995,7 +995,7 @@ return true;
     if(function_update)
       argv[argc++]= changefile;
     if(function_border_polygon) {
-      sp= stpcpy0(border,"-B=");
+      sp= stpcpy(border,"-B=");
       strcpy(sp,polygon_file);
       argv[argc++]= border;
       }
@@ -1396,7 +1396,7 @@ return 0;
       }
     if(strzcmp(a,"-t=")==0 && a[3]!=0) {
         // user-defined prefix for names of temorary files
-      strmcpy(process->tempfilename,a+3,sizeof(process->tempfilename)-30);
+      strncpy(process->tempfilename,a+3,sizeof(process->tempfilename)-30);
   continue;  // take next parameter
       }
     if(strzcmp(a,"-o=")==0 && a[3]!=0) {

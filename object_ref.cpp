@@ -49,7 +49,7 @@ static void posr__end() {
 static int posr_ini(const char* filename) {
   // open a temporary file with the given name for random r/w access;
   // return: ==0: ok; !=0: error;
-  strcpy(stpmcpy(posr__filename,filename,sizeof(posr__filename)-2),".2");
+  strcpy(stpncpy(posr__filename,filename,sizeof(posr__filename)-2),".2");
   if(posr__fd>=0)  // file already open
 return 0;  // ignore this call
   unlink(posr__filename);
